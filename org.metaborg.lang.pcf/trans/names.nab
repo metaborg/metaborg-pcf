@@ -1,0 +1,20 @@
+module names
+	
+namespaces Variable
+	
+binding rules
+
+  Var(x) :
+    refers to Variable x
+    
+  Param(x, t) :
+  	defines Variable x of type t
+    
+  Fun(p, e) :
+    scopes Variable
+    
+  Fix(p, e) :
+    scopes Variable
+    
+  Let(x, t, e1, e2) :
+    defines Variable x of type t in e2 

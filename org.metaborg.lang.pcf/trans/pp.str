@@ -1,0 +1,23 @@
+module pp
+
+imports
+
+	libstratego-gpp
+	lib/runtime/tmpl/pp
+	Common.pp.generated
+	PCF.pp.generated
+
+rules
+	
+  pp-PCF-string =
+    prettyprint-Exp
+    ; !V([], <id>)
+    ; box2text-string(|120)
+      
+  pp-debug :
+    ast -> result
+    with
+       result := <pp-PCF-string> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-PCF-string); debug(!"cannot pp ")))> ast
+    ;  result := ""
+

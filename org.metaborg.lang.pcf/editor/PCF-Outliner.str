@@ -1,0 +1,10 @@
+module editor/PCF-Outliner
+
+imports
+  include/PCF
+  lib/runtime/editor/outline-library
+  lib/runtime/editor/origins
+  editor/PCF-Outliner.generated
+
+rules
+  

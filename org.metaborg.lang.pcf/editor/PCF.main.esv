@@ -1,0 +1,31 @@
+module PCF.main
+
+imports
+  PCF-Colorer
+  PCF-Completions
+  PCF-Folding
+  PCF-Menus
+  PCF-Refactorings
+  PCF-References
+  PCF-Syntax
+  PCF-Views
+
+language General properties
+  
+  name:          PCF
+  id:            org.metaborg.lang.pcf
+  extends:       Root
+  
+  description:   "Spoofax-generated editor for the PCF language"
+  url:           http://strategoxt.org
+  
+  extensions:    pcf
+  table:         include/PCF.tbl
+  start symbols: Exp
+  
+  provider:      include/pcf.ctree
+  provider:      include/pcf-java.jar
+  
+  observer:      editor-analyze (multifile)
+  
+  on save:       editor-save

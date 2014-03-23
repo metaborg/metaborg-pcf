@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.imp.runtime.languageDescription">
+      <language
+            extensions="pcf"
+            description="PCF"
+            language="PCF"
+            derivedFrom="DynamicRoot"
+            validator="org.metaborg.lang.pcf.PCFValidator"
+            validatorClass="org.metaborg.lang.pcf.PCFValidator"
+      ></language>
+   </extension>
+   <extension
+         id="org.metaborg.lang.pcf.parser"
+         name="PCF Parser"
+         point="org.eclipse.imp.runtime.parser">
+      <parser
+            class="org.metaborg.lang.pcf.PCFParseController"
+            language="PCF">
+      </parser>
+   </extension>    
+</plugin>
