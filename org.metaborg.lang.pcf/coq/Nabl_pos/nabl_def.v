@@ -2,6 +2,7 @@ Require Import sdf_definition.
 Require Import List.
 Require Import Arith.
 Require Import Program.
+Require Import aux_lemmas.
 
 
 Module Type Nabl_Sig (s : Sdf_Sig).
@@ -33,311 +34,47 @@ Export nas.
 
 Section With_main_program.
         
+  (* Declare term variable and the correspinding mapping *)
+
     Variable t : term.
     Variable wft : wf_term Main_Sort t.
     Variable def_of : key -> key -> Prop.
 
+    (* Some notations*)
+
     Delimit Scope term_scope with term.
     Bind Scope term_scope with term.
     Notation " @ x " := (get x t) (at level 20) : term_scope.
-    Notation " x |-> y " := (def_of x y) (at level 20) : term_scope.
+    Notation " x |-> y " := (def_of x y) (at level 19) : term_scope.
     Notation " y @ x " := (@ x = Some y) (at level 19) : term_scope.
 
-    Lemma at_inj : forall x y z, x @ z -> y @ z -> x = y.
-    Proof. 
-      intros.
-      rewrite H in *; inversion H0; eauto.
-    Qed.
 
-    (* greatest lower scoping bound *)
-
-    Lemma dir_prefix_nil : forall k, ~ k <d< nil.
-      Proof.
-        intros.
-        intro.
-        inversion H.
-        discriminate H0.
-      Qed.
-        
-    Lemma prefix_nil : forall k, ~ k << nil.
-      Proof.
-        intros.
-        intro.
-          dependent induction H.
-          apply (dir_prefix_nil _ H).
-          destruct H.
-          discriminate H.
-      Qed.
-
-    Lemma prefix_refl_nil : forall k, k <<* nil -> k = nil.
-      Proof.
-        intros.
-          dependent induction H.
-          reflexivity.
-          contradiction (dir_prefix_nil) with y.
-      Qed.
-
-    Lemma prefix_nil_forall : forall k, nil <<* k.
-      Proof.
-        induction k.
-        apply rtn1_refl.
-        apply (Relation_Operators.rtn1_trans) with k.
-        exists a. reflexivity.
-        eauto.
-      Qed.
-      
-    Definition valid k := exists t0, @ k = Some t0.
-
-    Definition valid_t := forall k t1, t1 @ k -> k = t1 'k.    
-
-    Lemma val_subterm_aux : 
-      valid_t ->
-      forall c lp k,
-        (Co c lp k) @ k ->
-        forall p, (exists n, nth_error lp n = Some p) -> p @ (p 'k). 
-    Proof.
-      intro.
-      intros.
-      destruct H1.
-      assert (p @ (x::k)).
-      simpl. 
-      rewrite H0.
-      eauto.
-      rewrite <- (H _ p H2).
-      eauto.
-    Qed.
-
-    Lemma in_nth {A} : forall l (p : A), In p l <-> exists n, nth_error l n = Some p.
-    Proof.
-      induction l.
-      unfold In.
-      intros; split; intuition.
-      destruct H.
-      destruct x.
-      simpl in H.
-      discriminate H.
-      simpl in H.
-      discriminate H.
-      intros; split; intros.
-      destruct H.
-      exists 0; simpl; subst; eauto.
-      rewrite IHl in H.
-      destruct H.
-      exists (S x).
-      simpl.
-      eauto.
-      destruct H.
-      destruct x.
-      simpl in H.
-      inversion H; subst; left; eauto.
-      simpl in H.
-      destruct (IHl p).
-      right.
-      apply H1.
-      exists x; eauto.
-    Qed.
-
-    Lemma val_subterm :
-      valid_t ->
-      forall c lp k,
-        (Co c lp k) @ k ->
-        Forall (fun p => p @ (p 'k)) lp. 
-    Proof.
-      intros.
-      rewrite Forall_forall.
-      intros.
-      rewrite in_nth in H1 .
-      apply val_subterm_aux with c lp k; eauto.
-    Qed.
-
-    Lemma valid_nil : valid nil.
-      Proof.
-        unfold valid.
-        exists t.
-        unfold get. eauto.
-      Qed.
-
-
-
-    Lemma prefix_refl_add : forall k1 k2, k1 <<* k2 <-> exists k, k ++ k1 = k2. 
-    Proof.
-      intros k2 k0; generalize k2.
-      induction k0.
-      * intros.
-        split; intros.
-        + exists (nil : key).
-          simpl.
-          apply prefix_refl_nil.
-          eauto.
-        + destruct H.      
-          unfold app in H.
-          destruct x.
-          subst.
-          apply rtn1_refl.
-          inversion H.
-      * split; intros.
-        inversion H.
-        - exists (nil : key).
-          simpl.
-          reflexivity.
-        - unfold direct_prefix in H0.
-          destruct H0.
-          inversion H0.
-          subst.
-          specialize (IHk0 k3).
-          rewrite IHk0 in H1.
-          destruct H1.
-          subst.
-          exists (a::x).
-          eauto.
-        - destruct H.
-          destruct x.
-          simpl in H.
-          subst.
-          apply rtn1_refl.
-          inversion H.
-          destruct (IHk0 k3).
-          subst.          
-          apply (Relation_Operators.rtn1_trans) with (x ++ k3).
-          exists a.
-          eauto.
-          apply H3.
-          exists x.
-          reflexivity.
-    Qed.
-      
-
-    Lemma prefix_add : forall k1 k2, k1 << k2 <-> exists a k, a:: k ++ k1 = k2. 
-    Proof.
-      intros k2 k0; generalize k2.
-      induction k0.
-      * intros.
-        split; intros.
-        + contradiction (prefix_nil _ H).
-        + destruct H.      
-          destruct H.
-          inversion H.
-       * split; intros.
-         + inversion H.
-           - unfold direct_prefix in H0.
-             destruct H0.
-             inversion H0.
-             subst.
-             exists a (nil : key).
-             eauto.
-           - unfold direct_prefix in H0.
-             destruct H0.
-             inversion H0.
-             subst.
-             specialize (IHk0 k3).
-             rewrite IHk0 in H1.
-             destruct H1 as [a1 [k eqa]].
-             subst.
-             exists a (a1::k).
-             eauto.
-        + destruct H as [a1 [k1 eqa]].
-          destruct k1.
-          simpl in eqa.
-          rewrite <- eqa. 
-          apply tn1_step.
-          exists a1.
-          reflexivity.
-          inversion eqa.
-          destruct (IHk0 k3).
-          subst.          
-          apply (Relation_Operators.tn1_trans) with (n :: k4 ++ k3).
-          exists a.
-          eauto.
-          apply H2.
-          exists n k4.
-          reflexivity.
-    Qed.
-         Print Scopes.
-
-    Definition irreflexive {A} (R : A -> A -> Prop) := forall x, ~ R x x.  
-
-    Lemma irreflexive_prefix : irreflexive prefix. 
-      intro.
-      intro.
-      rewrite (prefix_add _ _) in H.
-      destruct H as [a [k keq]].
-      induction x.
-      discriminate keq. 
-      inversion keq.
-      assert (a::k = nil).
-      apply (app_inv_tail (a0::x) (a::k) nil).
-      eauto.
-      discriminate H.
-    Qed.
-
-    Lemma valid_pre : forall k1 k2, valid k2 -> k1 <<* k2 -> valid k1. 
-    Proof.
-      intros k1 k2; generalize k1; induction k2.
-      * intros.
-        rewrite (prefix_refl_nil _ H0).
-        exact valid_nil.
-      * intros.
-        rewrite prefix_refl_add in H0.
-        destruct H0.
-        destruct x.
-        simpl in H0.
-        subst; eauto.
-        apply IHk2.
-        unfold valid in H.
-        simpl in H.
-        unfold valid.
-        destruct H.
-        destruct (@ k2).
-        exists t0; eauto.
-        discriminate.
-        rewrite prefix_refl_add.
-        inversion H0.
-        exists x; eauto.
-    Qed.
-
+    (* Definiition of the scope surounding a term *)
     
     Inductive scope_of : key -> NS -> key -> Prop :=
-(*     | Scope_of_nil ns : scope_of nil ns nil  (* APT: This clause seems surprising; really doesn't seem needed *) *)
     | Scope_of_scope n k t1 ns:  
         (t1 @ k /\ scopes_R t1 ns) ->
-        valid (n::k) ->
+        valid t (n::k) ->
         scope_of (n::k) ns k
     | Scope_of_trans n k t1 ns ks :
         (t1 @ k /\ ~ scopes_R t1 ns) ->
         scope_of k ns ks ->
-        valid (n::k) ->
+        valid t (n::k) ->
         scope_of (n::k) ns ks
     .
 
+    (* Equivalent formulation *)
+
     Definition scope_of_bis k1 ns k2 :=
-      valid k1 (* APT: added this for the proof that follows *) /\  
+      valid t k1 (* APT: added this for the proof that follows *) /\  
       k2 << k1 /\ 
       (exists t1, ( t1 @ k2 /\ scopes_R t1 ns )) /\ 
       forall k, k2 <<* k -> k << k1 -> (exists t1, (t1 @ k /\ scopes_R t1 ns)) -> k2 = k. 
 
 
-    (* APT: A little experiment to check definition compatibility. *)    
+    (* APT: check definition compatibility. *)    
 
     Ltac inv H := inversion H; subst; clear H. 
-
-    (* $(&!@ unbelievable that these aren't in the library! *) 
-    Lemma tn1_rtn1: forall {A:Type} (R : relation A) (x y: A), 
-           clos_trans_n1 A R x y -> clos_refl_trans_n1 A R x y. 
-    Proof.
-      intros. induction H. 
-      eapply rtn1_trans; eauto.  eapply rtn1_refl.
-      eapply rtn1_trans with y; eauto. 
-    Qed.  
-
-    Lemma rtn1_tn1: forall {A:Type} (R: relation A) (x y:A),
-          clos_refl_trans_n1 A R x y -> x = y \/ clos_trans_n1 A R x y. 
-    Proof.
-      induction 1. 
-      intuition.
-      inv IHclos_refl_trans_n1. 
-        right. econstructor; eauto. 
-        right. eapply tn1_trans; eauto. 
-    Qed.
 
     Lemma bis_implies: forall k1 ns k2, scope_of_bis k1 ns k2 -> scope_of k1 ns k2. 
     Proof.
@@ -354,7 +91,7 @@ Section With_main_program.
         econstructor; eauto. 
         intros. eapply P3; eauto. unfold prefix in H2|-*.
         eapply tn1_trans.  econstructor; eauto.  eauto. }
-      assert (valid k2).  
+      assert (valid t k2).  
       {eapply valid_pre. eauto. eapply rtn1_trans with k2. econstructor; eauto.
        eapply rtn1_refl. }
       destruct H2 as [t2 R]. 
@@ -400,10 +137,16 @@ Section With_main_program.
             inv H5. inv H3. eauto.
       Qed.
 
-    (* End of experiment. *)
+    (* End of equivalence. *)
+
+
+
+    (* a definition at kd can reach kr through ks*) 
 
     Definition mightreach kr kd ks ns :=
       scope_of kd ns ks /\ ks << kr. 
+
+   (* a definition at kd reach (it reaches and is not shadowed) kr through ks*) 
 
     Definition reaches kr x ns ksm kdm tdefm kdixm := 
           tdefm @ kdm /\
@@ -418,6 +161,8 @@ Section With_main_program.
             (* this avoids duplicate definition *)
             (ksm = ks' /\ kdm = kd')).
  
+    (* definition of mapping soundness *)
+
     Definition map_sound_def :=
       forall kx kdx, 
         kx |-> kdx ->
@@ -463,13 +208,15 @@ Section With_main_program.
       apply t_trans with ksm2; assumption.
       intuition.
       subst.
-      apply at_inj with kdm1; assumption.
+      apply at_inj with t kdm1; assumption.
       intuition.
       subst.
-      apply at_inj with kdm2; assumption.
+      apply at_inj with t kdm2; assumption.
       rewrite H1 in *.
-      apply at_inj with kdm2; assumption.
+      apply at_inj with t kdm2; assumption.
     Qed.
+
+    (* Definition of a complete mapping *)
 
     Definition map_complete :=
       forall tref kr, 
@@ -481,21 +228,23 @@ Section With_main_program.
     .
 
 
+    (* Definition of a valid mapping, term well keyed and mapping osund and complete *)
+
     Record valid_term_map := 
       mkvalid { 
-          vt : valid_t;  
+          vt : valid_t t;  
           ms : map_sound_def; 
           mc : map_complete 
         }. 
 
-(*undef : exists_reaches;*)
-
+    (* We assume a valid mapping *)
 
     Variable valt : valid_term_map.
 
     (* General lemmas on terms *)
 
  
+    (* get on direct suffix succed implies it is a child *)
     Lemma get_par : 
       forall a k te, 
         te @ (a::k) ->
@@ -526,6 +275,8 @@ Section With_main_program.
       discriminate H.
     Qed.
     
+    (* a subterm of a well formed term is well formed *)
+
     Lemma wf_at : 
       forall k te, 
         te @ k -> exists s, wf_term s te.
@@ -563,7 +314,8 @@ Section With_main_program.
       apply IHlp with l; assumption.
     Qed. 
 
-
+    (*get suffix is a child*)
+    
     Lemma child_cons : 
       forall e k n,
         e @ (n::k) ->
@@ -578,6 +330,7 @@ Section With_main_program.
       eauto.
     Qed.
     
+    (* children are valid and direct suffix*)
 
     Lemma params_sup : 
       forall te e, 

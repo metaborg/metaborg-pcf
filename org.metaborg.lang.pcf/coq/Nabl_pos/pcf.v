@@ -229,18 +229,21 @@ Module sem_PCF.
 
   Section With_term.
 
+    (* we assume a well formed term with a valid mapping *)
+
     Variable t : term.
     Variable wft : wf_term Main_Sort t.
     Variable def_of : key -> key -> Prop.
     Variable valt : valid_term_map t def_of.    
 
-    
     Delimit Scope term_scope with term.
     Bind Scope term_scope with term.
     Notation " @ x " := (get x t) (at level 20) : term_scope.
     Notation " x |-> y " := (def_of x y) (at level 20) : term_scope.
     Notation " y @ x " := (@ x = Some y) (at level 19) : term_scope.
 
+
+    (* Type_define relation define terms of type type_sort*)
 
     Lemma typed_defines_types : 
       forall id NS ty k s, wf_term s t -> typed_definesR t id NS ty k -> wf_term Type_S ty.  
@@ -250,6 +253,9 @@ Module sem_PCF.
       invCo wft0.
       assumption.
     Qed.
+
+
+    (* A term is well_formed for a unique sort *)
 
     Lemma wf_unique : 
       forall e s1 s2,
@@ -335,22 +341,19 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
     | Natval (n : nat)
     | Boolval (b : bool) (* APT *) 
     | Clos (v : Ident) (t : term) (e : Env)
-    .
-    
-    
+    .    
 
     Coercion Natval : nat >-> value.
     Coercion Boolval : bool >-> value. (* APT *) 
 
-    (* some notation for Eelco ... similar to spoofax definitions  *)
+    (* Notations similar to spoofax ones *)
     Delimit Scope spoofax_scope with spfx.
     Bind Scope spoofax_scope with term.
     Notation " { a |--> t , env }" := (env_extend env a t) : spoofax_scope. 
     Notation " C |- t : ty " := (well_typed_infer C t ty) (at level 20) : spoofax_scope.
     Open Scope spoofax_scope.
 
-    (* a lookup in the semantivcs environment, an environment can contain several 
-   mapping for the same id but only the first one (in the list) count *)
+    (* a lookup in the semantics environment *)
     
     Inductive get_env x : Env -> term -> Env -> Prop :=
     | get_env_C t te c: 
@@ -360,8 +363,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
 
     (* Definition of the semantics, direct translation of dynsem rules,
    natural number arithmetic is represented with Coq natural numbers.
-   You may also prefer to have a look at the book, IntroPLtheory 
-   (in the trunk of autosound rep) p. 34 *)
+     *)
 
     Inductive semantics_cbn : Env -> term -> value -> Prop :=
     | VarC_sem x t k kt env va nenv  : 
@@ -407,21 +409,14 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
    "" the type of the term associated to x in the semantics environment is the same as the type of x "" 
      *)
 
-    (* we also need to have the corresponding scopes, so we say that for a particular global context C, a namespace ns
-   an environment env is compatible with a scope sc if :
-     --- the environment is empty
-     --- forall binding (x --> (t,tenv)) in the environement:
-        -- there is a scope "sct" associated to "t" in the context       
-        -- tenv is compatible with the context and this scope sct 
-        -- t is a well_formed (and well defined ...) term according to the context
-        -- t has type ty and x is visible in scope sc with type ty        
-     *)
-
+    (* the type of a variable at a particular position *)
 
     Definition type_at k x ns ty := 
       exists kdef tdef kdix ks, 
         reaches t k x ns ks kdef tdef kdix /\ 
         typed_definesR tdef x ns ty kdix.
+
+    (* Define a well typed environment *)
 
     Inductive compatible_env ns : key -> Env -> Prop :=
     | Compat_env k e :
@@ -433,6 +428,8 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
            exists ty,
              type_at k x ns ty /\
              well_typed_infer tr ty) -> compatible_env ns k e.
+
+    (* Define the type of a value *)
 
     Inductive type_value : value -> term -> Prop :=
     | Natval_type n k : 
@@ -446,6 +443,8 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
                     (compenv : compatible_env VarNS (t 'k) (env_remove env x))
                     (vist :  type_at (t 'k) x VarNS tyx)
       : type_value (Clos x t env) (Co TFunC [tyx;ty] k)  
+
+    (* equivalence of type case (keys do not matter in types) *)
 
     | Type_value_eq v t1 t2 :
         type_value v t1 ->
@@ -473,7 +472,9 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       eauto.
     Qed.
 
-       Lemma sort_in_sig : 
+    (* if a term is a constructor with well formed children, their sort is in the signature of the constructor*)
+
+    Lemma sort_in_sig : 
       forall e k n,
         e @ (n::k) ->
         forall c lp, (Co c lp k) @ k ->
@@ -495,6 +496,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       assumption.
     Qed.
 
+    (* The type of a param is equivalent to the one declared *)
 
     Lemma type_param_eq :
       forall x tx k ty, well_typed_infer (Co ParamC [x;tx] k) ty -> tx ~t ty.
@@ -505,6 +507,8 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       reflexivity.
       apply transitivity with ty1; intuition.
     Qed.
+
+    (* a Param is a child of Fix or Lam *)
 
     Lemma param_in_fun_fix : 
       forall c, 
@@ -644,6 +648,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
         destruct H8; subst; constructor.
     Qed.
 
+    (* LamC does not modify the type of variable other than the bound one *)
 
     Lemma LamC_pres_type :
       forall k z ns ty,
@@ -720,6 +725,9 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
         assumption.
     Qed.
 
+
+    (* LamC does not modify the type of variable other than the bound one *)
+
     Lemma FixC_pres_type :
       forall k z ns ty,
         type_at k z ns ty ->
@@ -794,6 +802,9 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
         assumption.
     Qed.
 
+
+    (* no variable has a type at root position*)
+
     Lemma type_at_root_nil : 
       forall x ty ns, ~ type_at nil x ns ty.  
     Proof.
@@ -808,25 +819,12 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       apply (prefix_nil _ H2).
     Qed.
 
-    (*  Lemma env_at_root_nenv : 
-    forall env ns, 
-      compatible_env ns nil env ->
-      forall x tr te, ~ get_env x env tr te.
-  Proof.
-    intros.
-    intro.
-    inversion H.
-    specialize (H1 _ _ _ H0).
-    destruct H1 as [co [wft [trat [ty [tyat wt]]]]].
-    subst.
-    apply (type_at_root_nil _ _ _ tyat).
-  Qed.
-     *)
+    (* something that scope is a scope *)
 
-    Lemma scope_of_scopes(* _or_nil*) :
+    Lemma scope_of_scopes :
       forall k1 ns k2, 
         scope_of t k1 ns k2 ->
-        forall t, t @ k2 -> scopes_R t ns (* \/ k2 = nil *).
+        forall t, t @ k2 -> scopes_R t ns .
     Proof.
       intros k1 ns1 ks2 scof.
       induction scof.
@@ -841,6 +839,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       apply IHscof; intuition.
     Qed.
 
+    (* if a node doesn't scope, it pereserves envirnoment compatibility *)
     
     Lemma compatible_env_trans_no_scope : 
       forall t k1 x env ns, 
@@ -890,6 +889,8 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       eapply tn1_trans; eauto.
     Qed.
 
+    (* Nil is compatible at any position *)
+
     Lemma compatible_Nenv :
       forall ns k, compatible_env ns k Nenv.
     Proof.
@@ -900,6 +901,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
       discriminate H1.
     Qed.
 
+    (* Main type preservation lemma, with generalization over terms and environment  *)
 
     Lemma type_preservation_aux :
       forall t0, 
@@ -1272,6 +1274,8 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
         apply IHwell_typed_infer with kt e2 e1; intuition.
     Qed. 
 
+    (* Main type preservation lemma *)
+
     Lemma type_preservation :
       forall v,  
         semantics_cbn Nenv t v ->
@@ -1289,9 +1293,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
     Qed.
     
 
-
-
-
+    (* Experiment on divergence definition *)
 
     CoInductive diverge_cbn : Env -> term -> Prop :=
     | VarC_div x t k kt env nenv : 
@@ -1340,7 +1342,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
 
 
   End With_term.
+
   Check type_preservation.
-  Print scope_of.
 
 End sem_PCF. 

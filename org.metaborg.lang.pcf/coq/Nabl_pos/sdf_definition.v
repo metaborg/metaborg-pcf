@@ -2,6 +2,8 @@ Require Import List.
 Require Export Relation_Operators.
 Require Import Operators_Properties.  (* APT: Seems to introduce some very weird Notations, so don't export *)
 Require Export Setoid.
+Require Import Program.
+Require Import aux_lemmas.
 
 Module Type Sdf_Sig.
 (* Abstract definition of an SDF instance *)
@@ -116,6 +118,8 @@ Inductive wf_term : sort -> term -> Prop :=
 
 Open Scope term_scope.
 
+
+(* return the subterm corresponding to the given key *)
 Fixpoint get key t :=
   match key with 
     | nil => Some t 
@@ -180,5 +184,252 @@ Add Relation term term_eq
  symmetry proved by (@term_eq_sym)
  transitivity proved by (@term_eq_trans)
  as eq_term.
+
+Section With_term.
+
+  (* we assume t is a well-formed term*)
+
+    Variable t : term.
+    Variable wft : wf_term Main_Sort t.
+
+  (* Some notations *)
+    Delimit Scope term_scope with term.
+    Bind Scope term_scope with term.
+    Notation " @ x " := (get x t) (at level 20) : term_scope.
+    Notation " y @ x " := (@ x = Some y) (at level 19) : term_scope.
+
+
+    (* Lemmas : at relation is injective *)
+
+    Lemma at_inj : forall x y z, x @ z -> y @ z -> x = y.
+    Proof. 
+      intros.
+      rewrite H in *; inversion H0; eauto.
+    Qed.
+
+    (* lemmas on prefix orders *)
+
+    Lemma dir_prefix_nil : forall k, ~ k <d< nil.
+      Proof.
+        intros.
+        intro.
+        inversion H.
+        discriminate H0.
+      Qed.
+        
+    Lemma prefix_nil : forall k, ~ k << nil.
+      Proof.
+        intros.
+        intro.
+          dependent induction H.
+          apply (dir_prefix_nil _ H).
+          destruct H.
+          discriminate H.
+      Qed.
+
+    Lemma prefix_refl_nil : forall k, k <<* nil -> k = nil.
+      Proof.
+        intros.
+          dependent induction H.
+          reflexivity.
+          contradiction (dir_prefix_nil) with y.
+      Qed.
+
+    Lemma prefix_nil_forall : forall k, nil <<* k.
+      Proof.
+        induction k.
+        apply rtn1_refl.
+        apply (Relation_Operators.rtn1_trans) with k.
+        exists a. reflexivity.
+        eauto.
+      Qed.
+      
+   Lemma prefix_refl_add : forall k1 k2, k1 <<* k2 <-> exists k, k ++ k1 = k2. 
+    Proof.
+      intros k2 k0; generalize k2.
+      induction k0.
+      * intros.
+        split; intros.
+        + exists (nil : key).
+          simpl.
+          apply prefix_refl_nil.
+          eauto.
+        + destruct H.      
+          unfold app in H.
+          destruct x.
+          subst.
+          apply rtn1_refl.
+          inversion H.
+      * split; intros.
+        inversion H.
+        - exists (nil : key).
+          simpl.
+          reflexivity.
+        - unfold direct_prefix in H0.
+          destruct H0.
+          inversion H0.
+          subst.
+          specialize (IHk0 k3).
+          rewrite IHk0 in H1.
+          destruct H1.
+          subst.
+          exists (a::x).
+          eauto.
+        - destruct H.
+          destruct x.
+          simpl in H.
+          subst.
+          apply rtn1_refl.
+          inversion H.
+          destruct (IHk0 k3).
+          subst.          
+          apply (Relation_Operators.rtn1_trans) with (x ++ k3).
+          exists a.
+          eauto.
+          apply H3.
+          exists x.
+          reflexivity.
+    Qed.
+      
+
+    Lemma prefix_add : forall k1 k2, k1 << k2 <-> exists a k, a:: k ++ k1 = k2. 
+    Proof.
+      intros k2 k0; generalize k2.
+      induction k0.
+      * intros.
+        split; intros.
+        + contradiction (prefix_nil _ H).
+        + destruct H.      
+          destruct H.
+          inversion H.
+       * split; intros.
+         + inversion H.
+           - unfold direct_prefix in H0.
+             destruct H0.
+             inversion H0.
+             subst.
+             exists a (nil : key).
+             eauto.
+           - unfold direct_prefix in H0.
+             destruct H0.
+             inversion H0.
+             subst.
+             specialize (IHk0 k3).
+             rewrite IHk0 in H1.
+             destruct H1 as [a1 [k eqa]].
+             subst.
+             exists a (a1::k).
+             eauto.
+        + destruct H as [a1 [k1 eqa]].
+          destruct k1.
+          simpl in eqa.
+          rewrite <- eqa. 
+          apply tn1_step.
+          exists a1.
+          reflexivity.
+          inversion eqa.
+          destruct (IHk0 k3).
+          subst.          
+          apply (Relation_Operators.tn1_trans) with (n :: k4 ++ k3).
+          exists a.
+          eauto.
+          apply H2.
+          exists n k4.
+          reflexivity.
+    Qed.
+
+    Definition irreflexive {A} (R : A -> A -> Prop) := forall x, ~ R x x.  
+
+    Lemma irreflexive_prefix : irreflexive prefix. 
+      intro.
+      intro.
+      rewrite (prefix_add _ _) in H.
+      destruct H as [a [k keq]].
+      induction x.
+      discriminate keq. 
+      inversion keq.
+      assert (a::k = nil).
+      apply (app_inv_tail (a0::x) (a::k) nil).
+      eauto.
+      discriminate H.
+    Qed.
+
+
+    (* definition of a valid key and a valid term*)
+
+    Definition valid k := exists t0, @ k = Some t0.
+
+    Definition valid_t := forall k t1, t1 @ k -> k = t1 'k.
+
+    (* Valid term implies valid subterm *)
+
+    Lemma val_subterm_aux : 
+      valid_t ->
+      forall c lp k,
+        (Co c lp k) @ k ->
+        forall p, (exists n, nth_error lp n = Some p) -> p @ (p 'k). 
+    Proof.
+      intro.
+      intros.
+      destruct H1.
+      assert (p @ (x::k)).
+      simpl. 
+      rewrite H0.
+      eauto.
+      rewrite <- (H _ p H2).
+      eauto.
+    Qed.
+
+
+    Lemma val_subterm :
+      valid_t ->
+      forall c lp k,
+        (Co c lp k) @ k ->
+        Forall (fun p => p @ (p 'k)) lp. 
+    Proof.
+      intros.
+      rewrite Forall_forall.
+      intros.
+      rewrite in_nth in H1 .
+      apply val_subterm_aux with c lp k; eauto.
+    Qed.
+
+    (* root key is valid*)
+
+    Lemma valid_nil : valid nil.
+      Proof.
+        unfold valid.
+        exists t.
+        unfold get. eauto.
+      Qed.
+
+    (* prefix of a valid key is valid *)
+ 
+    Lemma valid_pre : forall k1 k2, valid k2 -> k1 <<* k2 -> valid k1. 
+    Proof.
+      intros k1 k2; generalize k1; induction k2.
+      * intros.
+        rewrite (prefix_refl_nil _ H0).
+        exact valid_nil.
+      * intros.
+        rewrite prefix_refl_add in H0.
+        destruct H0.
+        destruct x.
+        simpl in H0.
+        subst; eauto.
+        apply IHk2.
+        unfold valid in H.
+        simpl in H.
+        unfold valid.
+        destruct H.
+        destruct (@ k2).
+        exists t0; eauto.
+        discriminate.
+        rewrite prefix_refl_add.
+        inversion H0.
+        exists x; eauto.
+    Qed.
+
+End With_term.
 
 End Sdf_Term.

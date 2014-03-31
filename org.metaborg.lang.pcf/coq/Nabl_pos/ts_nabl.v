@@ -28,7 +28,8 @@ Module TS_NaBL_def (ssig : Sdf_Sig) (nsig : Nabl_Sig ssig) (tssig : TS_Nabl_Sig 
 
   Section With_program.
     
-    (* I'm not found of sigma types but maybe this can be used *)
+    (* definition os Types in the language*)
+    
     Definition types := { te | wf_term type_sort te }.
     
     Variable t : term.
