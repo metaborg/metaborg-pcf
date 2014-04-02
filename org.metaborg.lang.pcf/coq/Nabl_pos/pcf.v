@@ -18,19 +18,18 @@ Module sdf_PCF <: Sdf_Sig.
   | Param_S
   | Type_S
   .
+
   Definition sort := sorts.
   Definition Ident_Sort := ID_S.
 
   Definition Ident := nat.
   Definition id_eq_dec := eq_nat_dec.
 
-
-  Lemma sort_eq_dec : forall (x y : sort), {x=y} + {x <> y}.
+  Lemma sort_eq_dec : forall (x y : sort), sumbool (x=y) (x <> y).
   Proof.
     induction x; destruct y; 
     first [ left; reflexivity | (right; discriminate) ].
   Qed.
-
 
   Inductive Constructors :=
   | TNatC
@@ -52,7 +51,6 @@ Module sdf_PCF <: Sdf_Sig.
   Definition constructors := Constructors.
 
   Definition key := list nat.
-  Definition k1 := [0]. 
 
   Fixpoint get_sig sc : list sort * sort :=
     match sc with
@@ -83,8 +81,6 @@ Module nabl_PCF <: Nabl_Sig (sdf_PCF).
   Module Term := Sdf_Term sdf_PCF.
   Export Term.
   
-  Set Printing Projections.
-
   Inductive ID_NS :=
   | VarNS 
   .
@@ -121,11 +117,7 @@ End nabl_PCF.
 
 Module ts_PCF. 
 
-
-  Module nabl_pcf_mod := nabl_PCF. 
-(*  Export nabl_PCF.
-*)
-  Module nabl_wf_mod := Nabl_wf sdf_PCF nabl_pcf_mod. 
+  Module nabl_wf_mod := Nabl_wf sdf_PCF nabl_PCF. 
   Export nabl_wf_mod.
 
   Definition type_sort := Type_S.
@@ -137,11 +129,8 @@ Module ts_PCF.
 
   Lemma typed_def_unique : forall tt id ns ty1 ty2 k1 k2, typed_defines_R tt id ns ty1 k1 -> typed_defines_R tt id ns ty2 k2 -> ty1 = ty2 /\ k1 = k2.
   Proof.
-    intros.
-    inversion H.
-    subst.
-    inversion H0; subst.
-    eauto.
+    intros tt id ns ty1 ty2 k1 k2 td1 td2.
+    inversion td1; subst; inversion td2; subst; eauto.
   Qed.
 
   Definition typed_definesR := typed_defines_R.
@@ -153,8 +142,8 @@ Module sem_PCF.
 
   Module nabl_pcf_mod := nabl_PCF. 
   Module ts_pcf_mod := ts_PCF. 
-
   Module ts_wf := TS_NaBL_def sdf_PCF nabl_pcf_mod ts_pcf_mod. 
+
   Import ts_wf.
 
   (* Some inversion tactics *)
@@ -322,6 +311,7 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
     Inductive Env := 
     | Cons_Env : (Ident -> option (term * Env)) -> Env   
     .
+
     Definition Nenv := Cons_Env (fun x => None).
     Definition get_e x env :=
       match env with Cons_Env m => m x end.
@@ -397,13 +387,10 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
         semantics_cbn env (Co TimesC [e1;e2] kt) (m * n) 
     .
 
-
-    Notation " env |- t --> v " := (semantics_cbn env t v) (at level 20) : spoofax_scope.
-
-    
+    Notation " env |- t --> v " := (semantics_cbn env t v) (at level 20) : spoofax_scope.    
 
     (* for type preservation with environments and not substitution we have to maintain a property on the 
-   term we store, that is:
+   term we store in environment, that is:
    "" the type of the term associated to x in the semantics environment is the same as the type of x "" 
      *)
 
@@ -1344,3 +1331,5 @@ last case is the equality modulo key if c |- t : ty1 and ty1 ~t ty2 then c |- t 
   Check type_preservation.
 
 End sem_PCF. 
+
+Print Scopes.
