@@ -77,13 +77,12 @@ Module sdf_PCF <: Sdf_Sig.
 
 End sdf_PCF.
 
-Module Term_PCF := Sdf_Term sdf_PCF.
 
 Module nabl_PCF <: Nabl_Sig (sdf_PCF).
 
-  Export Term_PCF.
-  Module Term := Term_PCF.
-
+  Module Term := Sdf_Term sdf_PCF.
+  Export Term.
+  
   Set Printing Projections.
 
   Inductive ID_NS :=
@@ -122,9 +121,10 @@ End nabl_PCF.
 
 Module ts_PCF. 
 
-  Module nabl_pcf_mod := nabl_PCF. 
-  Export nabl_PCF.
 
+  Module nabl_pcf_mod := nabl_PCF. 
+(*  Export nabl_PCF.
+*)
   Module nabl_wf_mod := Nabl_wf sdf_PCF nabl_pcf_mod. 
   Export nabl_wf_mod.
 
@@ -152,9 +152,7 @@ End ts_PCF.
 Module sem_PCF.
 
   Module nabl_pcf_mod := nabl_PCF. 
-  Export nabl_pcf_mod.
   Module ts_pcf_mod := ts_PCF. 
-  Export ts_pcf_mod.
 
   Module ts_wf := TS_NaBL_def sdf_PCF nabl_pcf_mod ts_pcf_mod. 
   Import ts_wf.
