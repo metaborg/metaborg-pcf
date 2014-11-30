@@ -1,2 +1,1 @@
-fix f : int -> int (fun n: int -> ifz n then 1 else n * (f (n - 1)))
-
+fix f : int -> int (fun n: int (ifz n then 1 else n * (f (n - 1))))
