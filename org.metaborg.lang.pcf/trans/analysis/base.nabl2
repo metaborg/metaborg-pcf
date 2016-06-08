@@ -6,7 +6,7 @@ imports
 
 constraint-generation rules
 
-  init :=
+  init [[ init ]] :=
     [[ init ^ (global) : ty ]].
 
 constraint-generation rules
