@@ -1,0 +1,43 @@
+module Expr
+
+imports
+
+  Identifiers
+
+template options
+
+  keyword -/- [a-zA-Z0-9\_]
+
+context-free syntax
+
+  Expr.Const    = INT
+  Expr.Ref      = ID
+  Expr.Ifz      = <ifz <Expr> then <Expr> else <Expr>>       {longest-match}
+  Expr.Fun      = [fun [ID] -> [Expr]]                       {longest-match}
+  Expr.Fix      = [fix [ID] -> [Expr]]                       {longest-match}
+  Expr.App      = <<Expr> <Expr>>                            {left}
+  Expr.Let      = <let <ID> = <Expr> in <Expr>>              {longest-match}
+  Expr.Add      = <<Expr> + <Expr>>                          {left}
+  Expr.Subtract = <<Expr> - <Expr>>                          {left}
+  Expr.Multiply = <<Expr> * <Expr>>                          {left}
+  Expr.Divide   = <<Expr> / <Expr>>                          {left}
+
+  Expr.LetPar   = <letpar <{Bind ";"}+> in <Expr>>           {longest-match}
+  Expr.LetRec   = <letrec <{Bind ";"}+> in <Expr>>           {longest-match}
+  Expr.LetSeq   = <letseq <{Bind ";"}+> in <Expr>>           {longest-match}
+
+  Bind.Bind     = <<ID> = <Expr>>
+
+  Expr          = <(<Expr>)> {bracket}
+  
+context-free priorities
+
+  Expr.App >
+  { left:
+    Expr.Multiply
+    Expr.Divide
+  } >
+  { left:
+    Expr.Add
+    Expr.Subtract
+  }

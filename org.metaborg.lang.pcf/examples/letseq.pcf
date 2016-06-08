@@ -1,0 +1,4 @@
+letseq
+  y = 21;
+  x = 2 * y
+in x

@@ -1,0 +1,14 @@
+module Desugared
+
+imports
+
+  Expr
+
+context-free syntax
+
+  Expr.BinExpr = <<Expr> <BinOp> <Expr>>
+
+  BinOp.Plus      = <+>
+  BinOp.Minus     = <->
+  BinOp.Times     = <*>
+  BinOp.DividedBy = </>

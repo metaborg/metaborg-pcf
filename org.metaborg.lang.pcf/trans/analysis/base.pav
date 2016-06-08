@@ -1,0 +1,34 @@
+module analysis/base
+
+imports
+
+  signatures/-
+
+constraint-generation rules
+
+  init :=
+    [[ init ^ (global) : ty ]].
+
+constraint-generation rules
+
+  [[ Ref(x) ^ (s) : ty ]] :=
+    {x} -> s,
+    {x} |-> d,
+    d : ty.
+
+constraint-generation rules
+
+  [[ Ifz(c,t,f) ^ (s) : ty ]] :=
+    [[ c ^ (s) : TInt() ]],
+    [[ t ^ (s) : ty ]],
+    [[ f ^ (s) : ty ]].
+
+constraint-generation rules
+
+  [[ Const(_) ^ (s) : TInt() ]] :=
+    true.
+
+  [[ BinExpr(e1,_,e2) ^ (s) : TInt() ]] :=
+    [[ e1 ^ (s) : TInt() ]],
+    [[ e2 ^ (s) : TInt() ]].
+

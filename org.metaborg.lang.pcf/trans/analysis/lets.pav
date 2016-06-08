@@ -1,0 +1,66 @@
+module analysis/lets
+
+imports
+
+  signatures/-
+
+constraint-generation rules
+
+  [[ Let(x,e1,e2) ^ (s) : ty2 ]] :=
+    [[ e1 ^ (s) : ty1 ]],
+    [[ e2 ^ (s') : ty2 ]],
+    s' -P-> s,
+    {x} <- s,
+    {x} : ty1,
+    new s'.
+
+constraint-generation rules
+
+  [[ LetPar(bs,e) ^ (s) : ty ]] :=
+    s' -P-> s,
+    BindPar [[ bs ^ (s,s') ]],
+    [[ e ^ (s') : ty ]],
+    new s'.
+
+  BindPar [[ [Bind(x,e)|bs] ^ (s,ls) ]] :=
+    {x} <- ls,
+    {x} : ty,
+    [[ e ^ (s) : ty ]],
+    BindPar [[ bs ^ (s,ls) ]].
+
+  BindPar [[ [] ^ (_,_) ]] := true.
+
+constraint-generation rules
+
+  [[ LetRec(bs,e) ^ (s) : ty ]] :=
+    s' -P-> s,
+    BindRec [[ bs ^ (s') ]],
+    [[ e ^ (s') : ty ]],
+    new s'.
+
+  BindRec [[ [Bind(x,e)|bs] ^ (s) ]] :=
+    {x} <- s,
+    {x} : ty,
+    [[ e ^ (s) : ty ]],
+    BindRec [[ bs ^ (s) ]].
+
+  BindRec [[ [] ^ (_) ]] := true.
+
+constraint-generation rules
+
+  [[ LetSeq(bs,e) ^ (s) : ty ]] :=
+    BindSeq [[ bs ^ (s,s') ]],
+    [[ e ^ (s') : ty ]],
+    new s'.
+
+  BindSeq [[ [Bind(x,e)|bs] ^ (s,s'') ]] :=
+    s' -P-> s,
+    {x} <- s',
+    {x} : ty,
+    [[ e ^ (s) : ty ]],
+    BindSeq [[ bs ^ (s',s'') ]],
+    new s'.
+
+  BindSeq [[ [] ^ (s,s') ]] :=
+    s' -P-> s.
+

@@ -1,51 +1,16 @@
 module PCF
 
-imports Common
+imports
 
-context-free start-symbols Exp
+  Identifiers
+  Layout
+  Expr
+  Type
 
-sorts Exp Param Type 
+context-free start-symbols
 
-templates
+  Start
 
-  Exp.Var = [[ID]]
-  Exp.App = [[Exp] [Exp]] {left}
-   
-  Exp.Fun =
-  	[fun [Param] (
-  		 [Exp]
-  	 )]
-  	 
-  Exp.Fix = 
-  	[fix [Param] (
-  		 [Exp]
-  	 )]
-  
-  Exp.Let = 
-  	[let [ID] : [Type] = 
-  		 [Exp] 
-  	  in [Exp]]
-  
-  Param.Param = [[ID] : [Type]]
-  
-  Exp.Num = [[INT]]
-  Exp.Add = [[Exp] + [Exp]] {left}
-  Exp.Sub = [[Exp] - [Exp]] {left}
-  Exp.Mul = [[Exp] * [Exp]] {left}
-  Exp.Div = [[Exp] / [Exp]] {left}
-  Exp     = [([Exp])] {bracket}
-  
-  Exp.Ifz = 
-  	[ifz [Exp] 
-  	 then [Exp] 
-  	 else [Exp]]
-   
-  Type.IntType = [int]
-  Type.FunType = [[Type] -> [Type]]
- 
-context-free priorities
+context-free syntax
 
-  Exp.App 
-  > Exp.Mul
-  > {left: Exp.Add Exp.Sub} 
-  > Exp.Ifz 
+  Start = Expr

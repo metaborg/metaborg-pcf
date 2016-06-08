@@ -1,0 +1,4 @@
+letrec
+  x = 2 * y;
+  y = 21
+in x

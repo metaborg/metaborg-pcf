@@ -2,22 +2,21 @@ module pp
 
 imports
 
-	libstratego-gpp
-	lib/runtime/tmpl/pp
-	Common.pp.generated
-	PCF.pp.generated
+  libstratego-gpp
+  pp/-
 
 rules
-	
+
   pp-PCF-string =
-    prettyprint-Exp
+    parenthesize-PCF
+    ; prettyprint-SDF-start-symbols
     ; !V([], <id>)
     ; box2text-string(|120)
-      
-  pp-debug :
-    ast -> result
-    with
-       result := <pp-PCF-string> ast
-    <+ <bottomup(try(not(is-string); not(is-list); not(pp-PCF-string); debug(!"cannot pp ")))> ast
-    ;  result := ""
 
+  pp-partial-PCF-string =
+    parenthesize-PCF
+    ; prettyprint-example
+    ; !V([], <id>)
+    ; box2text-string(|120)
+
+  pp-completion = pp-partial-PCF-string

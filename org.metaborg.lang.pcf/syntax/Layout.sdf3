@@ -1,0 +1,22 @@
+module Layout
+
+lexical syntax
+
+  LAYOUT      = [\ \t\r\n]
+  LAYOUT      = "//" ~[\r\n]* ([\r\n] | EOF)
+  LAYOUT      = "!" ~[\!\r\n]* "!"
+  LAYOUT      = "/*" CommentChar* "*/" EOF?
+  CommentChar = ~[\/\*] | Asterisk
+  Asterisk    = "*"
+  EOF         =
+
+lexical restrictions
+
+  Asterisk    -/- [\/]
+  EOF         -/- ~[]
+
+context-free restrictions
+
+  LAYOUT?   -/- [\ \t\r\n]
+  LAYOUT?   -/- [\/].[\/]
+  LAYOUT?   -/- [\/].[\*]

@@ -1,0 +1,24 @@
+module PCF.main
+
+imports
+
+  Menus
+  pavlov/Menus
+  pavlov/References
+  editor/Colorer.generated
+  completion/colorer/PCF-cc-esv
+
+language General properties
+
+  name:              PCF
+  id:                org.metaborg.lang.pcf
+  description:       "Spoofax-generated editor for the PCF language"
+  extensions:        pcf
+
+  table:             target/metaborg/sdf.tbl
+  start symbols:     Start
+
+  provider:          target/metaborg/stratego.ctree
+
+  observer:          editor-analyze
+  context:           taskengine

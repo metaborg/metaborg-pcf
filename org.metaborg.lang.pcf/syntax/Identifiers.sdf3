@@ -1,0 +1,23 @@
+module Identifiers
+
+lexical syntax
+
+  INT        = "-"? [0-9]+
+
+  ID         = [a-zA-Z][a-zA-Z0-9]*
+
+lexical restrictions
+
+  INT       -/- [0-9]
+
+  ID        -/- [a-zA-Z0-9]
+
+lexical syntax
+
+  ID = Keyword {reject}
+ 
+  Keyword = "ifz" | "then" | "else"
+          | "fun"
+          | "fix"
+          | "let" | "in"
+          | "int"

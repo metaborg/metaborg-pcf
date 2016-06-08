@@ -1,0 +1,7 @@
+let
+  x = 21
+in
+  letpar
+    x = 2 * x;
+    y = x
+  in x

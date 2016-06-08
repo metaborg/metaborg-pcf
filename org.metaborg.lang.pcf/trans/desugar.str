@@ -1,0 +1,17 @@
+module desugar
+
+imports
+  libstratego-gpp
+  runtime/tmpl/pp
+  libstratego-sglr
+  signatures/-
+  stratego/metaborg
+
+rules
+
+  desugar-all = bottomup(try(origin-track-forced(desugar)))
+  
+  desugar: Add(e1,e2)      -> BinExpr(e1,Plus(),e2)
+  desugar: Subtract(e1,e2) -> BinExpr(e1,Minus(),e2)
+  desugar: Multiply(e1,e2) -> BinExpr(e1,Times(),e2)
+  desugar: Divide(e1,e2)   -> BinExpr(e1,DividedBy(),e2)

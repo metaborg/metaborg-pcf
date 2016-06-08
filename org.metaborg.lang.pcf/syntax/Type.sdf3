@@ -1,0 +1,6 @@
+module Type
+
+context-free syntax
+
+  Type.TInt = <Int>
+  Type.TFun = [[Type] -> [Type]] {right}

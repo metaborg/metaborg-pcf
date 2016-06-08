@@ -1,0 +1,26 @@
+module analysis/functions
+
+imports
+
+  signatures/-
+
+constraint-generation rules
+
+  [[ Fun(x,e) ^ (s) : TFun(ty1,ty2) ]] :=
+    [[ e ^ (s') : ty2 ]],
+    {x} : ty1,
+    {x} <- s',
+    s' -P-> s,
+    new s'.
+
+  [[ Fix(x,e) ^ (s) : TFun(ty',ty') ]] :=
+    [[ e ^ (s') : ty' ]],
+    {x} : ty',
+    {x} <- s',
+    s' -P-> s,
+    new s'.
+ 
+  [[ App(e1,e2) ^ (s) : ty' ]] :=
+    [[ e1  ^ (s) : TFun(ty,ty') ]],
+    [[ e2  ^ (s) : ty ]].
+ 
