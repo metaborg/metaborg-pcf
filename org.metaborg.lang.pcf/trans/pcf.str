@@ -8,8 +8,8 @@ imports
   runtime/editor/outline-library
   runtime/completion/-
 
-  pavlovshared
-  pavlovruntime
+  nabl2shared
+  nabl2runtime
   
   signatures/-
   completion/PCF-cp

@@ -2,8 +2,8 @@ module analysis/main
 
 imports
   
-  pavlovshared
-  pavlovruntime
+  nabl2shared
+  nabl2runtime
 
   analysis/-
 
