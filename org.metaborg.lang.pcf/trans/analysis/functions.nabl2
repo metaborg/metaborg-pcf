@@ -13,9 +13,9 @@ constraint-generation rules
     s' -P-> s,
     new s'.
 
-  [[ Fix(x,e) ^ (s) : TFun(ty',ty') ]] :=
-    [[ e ^ (s') : ty' ]],
-    {x} : ty',
+  [[ Fix(x,e) ^ (s) : TFun(ty,ty) ]] :=
+    [[ e ^ (s') : TFun(ty,ty) ]],
+    {x} : TFun(ty,ty),
     {x} <- s',
     s' -P-> s,
     new s'.
