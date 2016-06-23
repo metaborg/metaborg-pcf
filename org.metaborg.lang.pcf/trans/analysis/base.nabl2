@@ -6,8 +6,8 @@ imports
 
 constraint-generation rules
 
-  init [[ init ]] :=
-    [[ init ^ (global) : ty ]].
+  init [[ Start(e) ]] :=
+    [[ e ^ (global) : ty ]].
 
 constraint-generation rules
 
@@ -25,7 +25,7 @@ constraint-generation rules
 
 constraint-generation rules
 
-  [[ Const(_) ^ (s) : TInt() ]] :=
+  [[ Const(_) ^ (_) : TInt() ]] :=
     true.
 
   [[ BinExpr(e1,_,e2) ^ (s) : TInt() ]] :=

@@ -1,0 +1,61 @@
+module pcf
+
+imports
+
+  ds-signatures/PCF-sig
+  ds-signatures/Desugared-sig
+
+signature
+
+  sorts V constructors
+    NumV     : Int -> V
+    ClosureV : Env * String * Expr -> V
+
+  sort aliases
+    Env = Map(String, V)
+
+  arrows
+    Start -init-> V
+    Expr --> V
+ 
+  native operators
+    parseI    : String -> Int 
+    addI      : Int * Int -> Int
+    subtractI : Int * Int -> Int
+    multiplyI : Int * Int -> Int
+    divideI   : Int * Int -> Int
+    
+  variables
+    E : Env 
+    v : V
+
+rules
+
+  Start(e) -init-> v
+    where Env {} |- e --> v.
+
+  Const(i) --> NumV(parseI(i)).
+
+  BinExpr(NumV(i1),Plus(),NumV(i2)) --> NumV(addI(i1,i2)).
+  BinExpr(NumV(i1),Minus(),NumV(i2)) --> NumV(subtractI(i1,i2)).
+  BinExpr(NumV(i1),Times(),NumV(i2)) --> NumV(multiplyI(i1,i2)).
+  BinExpr(NumV(i1),DividedBy(),NumV(i2)) --> NumV(divideI(i1,i2)).
+
+  E |- Ref(x) --> E[x].
+
+  Ifz(NumV(0),v,_) --> v.
+  Ifz(NumV(i),_,v) --> v
+    where i != 0.
+
+  E |- Fun(x,e) --> ClosureV(E,x,e).
+
+  App(ClosureV(E,x,e),v) --> v'
+    where Env {x |--> v, E} |- e --> v'.
+ 
+  E |- Let(x,v1,e) --> v2
+    where Env {x |--> v1, E} |- e --> v2.
+
+  
+  
+  
+  

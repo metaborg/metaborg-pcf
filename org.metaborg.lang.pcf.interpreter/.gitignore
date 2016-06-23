@@ -1,0 +1,9 @@
+/target/
+/.apt_generated/
+/src/main/java/**/generated/
+/src/main/resources/parsetable.tbl
+/src/main/resources/specification.aterm
+/.project
+/.classpath
+/.settings
+/.factorypath

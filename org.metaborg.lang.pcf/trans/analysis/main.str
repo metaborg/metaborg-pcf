@@ -7,3 +7,6 @@ imports
 
   analysis/-
 
+rules
+
+  debug-generate-constraint = debug
