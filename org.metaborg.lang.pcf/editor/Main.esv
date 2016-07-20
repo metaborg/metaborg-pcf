@@ -19,5 +19,4 @@ language General properties
 
   provider:          target/metaborg/stratego.ctree
 
-  observer:          editor-analyze
-  context:           taskengine
+  observer:          editor-analyze (multifile)
