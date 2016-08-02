@@ -14,13 +14,8 @@ imports
   signatures/-
   completion/PCF-cp
 
-  desugar
   analysis/main
   pp
-
-rules // Analysis
-
-  editor-analyze = analyze(desugar-all,id)
 
 rules // Debugging
 

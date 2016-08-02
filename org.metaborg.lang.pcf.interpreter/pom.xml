@@ -5,6 +5,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <groupId>org.metaborg</groupId>
   <artifactId>org.metaborg.lang.pcf.interpreter</artifactId>
   <version>1.0.0-SNAPSHOT</version>
+  <properties>
+    <metaborg-version>2.1.0-SNAPSHOT</metaborg-version>
+    <truffle-version>0.15</truffle-version>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -17,49 +21,32 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>metaborg-release-repo</id>
-      <url>http://artifacts.metaborg.org/content/repositories/releases/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>metaborg-snapshot-repo</id>
-      <url>http://artifacts.metaborg.org/content/repositories/snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.metaborg</groupId>
       <artifactId>org.metaborg.meta.lang.dynsem.interpreter</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>${metaborg-version}</version>
     </dependency>
     <dependency>
       <groupId>com.oracle.truffle</groupId>
       <artifactId>truffle-api</artifactId>
-      <version>0.15</version>
-      <type>jar</type>
+      <version>${truffle-version}</version>
     </dependency>
     <dependency>
       <groupId>com.oracle.truffle</groupId>
       <artifactId>truffle-dsl-processor</artifactId>
-      <version>0.15</version>
+      <version>${truffle-version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.metaborg</groupId>
       <artifactId>org.spoofax.terms</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>${metaborg-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.metaborg</groupId>
+      <artifactId>org.metaborg.spoofax.core</artifactId>
+      <version>${metaborg-version}</version>
     </dependency>
   </dependencies>
 </project>

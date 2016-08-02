@@ -6,8 +6,10 @@ imports
 
 constraint-generation rules
 
-  init [[ Start(e) ]] :=
-    [[ e ^ (global) : ty ]].
+  init ^ (s) : ty := new s.
+
+  [[ Start(e) ^ (s) : ty ]] :=
+    [[ e ^ (s) : ty ]].
 
 constraint-generation rules
 
@@ -16,14 +18,10 @@ constraint-generation rules
     {x} |-> d,
     d : ty.
 
-constraint-generation rules
-
   [[ Ifz(c,t,f) ^ (s) : ty ]] :=
     [[ c ^ (s) : TInt() ]],
     [[ t ^ (s) : ty ]],
     [[ f ^ (s) : ty ]].
-
-constraint-generation rules
 
   [[ Const(_) ^ (_) : TInt() ]] :=
     true.
@@ -31,4 +29,3 @@ constraint-generation rules
   [[ BinExpr(e1,_,e2) ^ (s) : TInt() ]] :=
     [[ e1 ^ (s) : TInt() ]],
     [[ e2 ^ (s) : TInt() ]].
-
