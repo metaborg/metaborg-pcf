@@ -4,14 +4,23 @@ imports
 
   signatures/-
 
-constraint-generation rules
+signature
+
+  rules
+    [[ Expr ]] ^ (scope) : *
+
+  types
+    TInt()
+    TFun(type,type)
+    
+rules
 
   init ^ (s) : ty := new s.
 
   [[ Start(e) ^ (s) : ty ]] :=
     [[ e ^ (s) : ty ]].
 
-constraint-generation rules
+rules
 
   [[ Ref(x) ^ (s) : ty ]] :=
     {x} -> s,

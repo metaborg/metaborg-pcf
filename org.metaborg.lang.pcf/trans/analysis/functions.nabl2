@@ -4,7 +4,7 @@ imports
 
   signatures/-
 
-constraint-generation rules
+rules
 
   [[ Fun(x,e) ^ (s) : TFun(ty1,ty2) ]] :=
     [[ e ^ (s') : ty2 ]],
