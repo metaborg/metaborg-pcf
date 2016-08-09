@@ -9,7 +9,7 @@ imports
 
 rules
 
-  desugar-all = bottomup(try(origin-track-forced(desugar)))
+  desugar-all = bottomup(try(desugar))
   
   desugar: Add(e1,e2)      -> BinExpr(e1,Plus(),e2)
   desugar: Subtract(e1,e2) -> BinExpr(e1,Minus(),e2)

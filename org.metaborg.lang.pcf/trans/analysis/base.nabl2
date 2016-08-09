@@ -6,13 +6,30 @@ imports
 
 signature
 
-  rules
-    [[ Expr ]] ^ (scope) : *
+  constraint generator
+    // scope parameters and (optionally) type per syntactic sort
+    [[ Start ^ (s)     ]]
+    [[ Exp   ^ (s) : * ]]
+
+  name resolution
+    // custom edge labels (extends default set of P, I)
+    labels
+    // partial order for the labels (extends default label order)
+    // NB. for now implied pairs are not calculated,
+    //     so make sure to be complete. E.g. in the case of
+    //     X < Y, Y < Z you must add X < Z as well.
+    order
+      D < I,
+      D < P,
+      I < P
+    // specify well-formedness regex (overrides default well-formedness)
+    well-formedness
+      P*.I*
 
   types
     TInt()
     TFun(type,type)
-    
+ 
 rules
 
   init ^ (s) : ty := new s.
@@ -22,19 +39,16 @@ rules
 
 rules
 
-  [[ Ref(x) ^ (s) : ty ]] :=
-    {x} -> s,
-    {x} |-> d,
-    d : ty.
+  [[ Const(_) ^ (_) : TInt() ]] :=
+    true,
+    true.
 
   [[ Ifz(c,t,f) ^ (s) : ty ]] :=
     [[ c ^ (s) : TInt() ]],
     [[ t ^ (s) : ty ]],
     [[ f ^ (s) : ty ]].
 
-  [[ Const(_) ^ (_) : TInt() ]] :=
-    true.
-
   [[ BinExpr(e1,_,e2) ^ (s) : TInt() ]] :=
     [[ e1 ^ (s) : TInt() ]],
     [[ e2 ^ (s) : TInt() ]].
+

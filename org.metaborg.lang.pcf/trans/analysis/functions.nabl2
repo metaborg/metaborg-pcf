@@ -24,3 +24,7 @@ rules
     [[ e1  ^ (s) : TFun(ty,ty') ]],
     [[ e2  ^ (s) : ty ]].
  
+  [[ Ref(x) ^ (s) : ty ]] :=
+    {x} -> s,
+    {x} |-> d,
+    d : ty.
