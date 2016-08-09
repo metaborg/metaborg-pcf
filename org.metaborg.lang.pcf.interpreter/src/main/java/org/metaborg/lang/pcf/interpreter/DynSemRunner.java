@@ -14,7 +14,6 @@ import org.metaborg.core.language.ILanguageDiscoveryRequest;
 import org.metaborg.core.language.ILanguageImpl;
 import org.metaborg.core.project.IProject;
 import org.metaborg.core.project.IProjectService;
-import org.metaborg.lang.pcf.interpreter.generated.PCFEntryPoint;
 import org.metaborg.meta.lang.dynsem.interpreter.DynSemEntryPoint;
 import org.metaborg.meta.lang.dynsem.interpreter.nodes.rules.RuleResult;
 import org.metaborg.spoofax.core.Spoofax;
@@ -25,15 +24,13 @@ import org.metaborg.spoofax.core.unit.ISpoofaxParseUnit;
 import org.metaborg.util.concurrent.IClosableLock;
 import org.spoofax.interpreter.terms.IStrategoTerm;
 
-import com.google.inject.Module;
-
 public class DynSemRunner {
 
 	private final Spoofax S;
 	private final ILanguageImpl language;
 	private final DynSemEntryPoint interpreter;
 	
-	private DynSemRunner(Spoofax S, String languageName, DynSemEntryPoint interpreter)
+	public DynSemRunner(Spoofax S, String languageName, DynSemEntryPoint interpreter)
 			throws MetaborgException {
 		this.S = S;
 		this.language = loadLanguage(languageName);
@@ -93,22 +90,6 @@ public class DynSemRunner {
             RuleResult result = interpreter.getCallable(program, in, out, err).call();
             return result.result;
         } catch (Exception e) {
-            throw new MetaborgException("Evaluation failed.", e);
-        }
-    }
-
-	public static void main(String... args) throws MetaborgException {
-        if(args.length < 1) {
-            throw new MetaborgException("Usage: "+DynSemRunner.class.getName()+" FILES");
-        }
-        try(Spoofax S = new Spoofax(new DynSemRunnerModule(), new Module[0])) {
-        	DynSemRunner runner = new DynSemRunner(S, "PCF", new PCFEntryPoint());
-        	for(String fileName : args) {
-				FileObject file = S.resourceService.resolve(fileName);
-				Object result = runner.run(file, System.in, System.out, System.err);
-				System.out.println(result);
-        	}
-        } catch (MetaborgException e) {
             throw new MetaborgException("Evaluation failed.", e);
         }
     }
