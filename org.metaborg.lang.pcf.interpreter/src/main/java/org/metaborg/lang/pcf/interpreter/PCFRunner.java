@@ -3,6 +3,8 @@ package org.metaborg.lang.pcf.interpreter;
 import org.apache.commons.vfs2.FileObject;
 import org.metaborg.core.MetaborgException;
 import org.metaborg.lang.pcf.interpreter.generated.PCFEntryPoint;
+import org.metaborg.meta.lang.dynsem.interpreter.DynSemRunner;
+import org.metaborg.meta.lang.dynsem.interpreter.DynSemRunnerModule;
 import org.metaborg.spoofax.core.Spoofax;
 
 import com.google.inject.Module;

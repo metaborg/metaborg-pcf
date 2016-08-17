@@ -21,4 +21,5 @@ public abstract class parseI_1 extends TermBuild {
     public static TermBuild create(SourceSection source, TermBuild stringbuild) {
         return parseI_1NodeGen.create(source, stringbuild);
     }
+
 }

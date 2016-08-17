@@ -45,21 +45,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <dependencies>
     <dependency>
       <groupId>org.metaborg</groupId>
-      <artifactId>org.spoofax.terms</artifactId>
-      <version>${metaborg-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.metaborg</groupId>
-      <artifactId>org.metaborg.core</artifactId>
-      <version>${metaborg-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.metaborg</groupId>
-      <artifactId>org.metaborg.spoofax.core</artifactId>
-      <version>${metaborg-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.metaborg</groupId>
       <artifactId>org.metaborg.meta.lang.dynsem.interpreter</artifactId>
       <version>${metaborg-version}</version>
     </dependency>
@@ -67,7 +52,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
       <groupId>com.oracle.truffle</groupId>
       <artifactId>truffle-api</artifactId>
       <version>0.15</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>com.oracle.truffle</groupId>
