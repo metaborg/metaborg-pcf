@@ -2,10 +2,9 @@ module desugar
 
 imports
   libstratego-gpp
-  runtime/tmpl/pp
   libstratego-sglr
+  libspoofax/sdf/pp
   signatures/-
-  stratego/metaborg
 
 rules
 

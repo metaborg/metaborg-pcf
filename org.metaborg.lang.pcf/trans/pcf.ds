@@ -2,8 +2,14 @@ module pcf
 
 imports
 
+  nabl2/runtime/interpreter/scopegraph-impl
+
   ds-signatures/PCF-sig
   ds-signatures/Desugared-sig
+
+  analysis/base
+  analysis/functions
+  analysis/lets
 
 signature
 
@@ -20,23 +26,24 @@ signature
     Expr --> V
  
   native operators
-    parseI    : String -> Int 
+    parseI    : String -> Int
     addI      : Int * Int -> Int
     subtractI : Int * Int -> Int
     multiplyI : Int * Int -> Int
     divideI   : Int * Int -> Int
-    
+
   variables
-    E : Env 
-    v : V 
+    E : Env
+    v : V
 
 rules
 
-  Start(e) -init-> v
-    where Env {} |- e --> v.
+  s@Start(e) -init-> v
+    where NaBL2(s) -init-> _;
+          Env {} |- e --> v.
 
   Const(i) --> NumV(parseI(i)).
-  
+ 
   Subtract(NumV(i), NumV(j)) --> NumV(subtractI(i, j)).
 
   BinExpr(NumV(i1), Plus(), NumV(i2)) --> NumV(addI(i1, i2)).
@@ -45,23 +52,24 @@ rules
   BinExpr(NumV(i1), DividedBy(), NumV(i2)) --> NumV(divideI(i1, i2)).
 
   E |- Ref(x) --> E[x].
+  //where pathOf(Occurrence("NS",x,index)) => p,
+  //      deref(p,f) => v. // [E(P),N(I,_),D(_)]
 
   Ifz(NumV(0), v, _) --> v.
   Ifz(NumV(i), _, v) --> v
     where i != 0.
 
-  E |- Fun(x, e) --> ClosureV(E, x, e).
+  E |- fun@Fun(x, e) --> ClosureV(E, x, e)
+    where fun -paramsOf-> s;
+          fun -typeOf-> ty.
 
   App(ClosureV(E, x, e), v) --> v'
     where Env {x |--> v, E} |- e --> v'.
-  
-  Fix(f, e) --> FixV(f, e).
-  
-  App(fix@FixV(f, ClosureV(E, x, e)), v) --> v'
-  where Env {f |--> fix, x |--> v, E} |- e --> v'.
+
+  Fix(fun, e) --> FixV(fun, e).
+
+  App(fix@FixV(fun, ClosureV(E, x, e)), v) --> v'
+  where Env {fun |--> fix, x |--> v, E} |- e --> v'.
  
   E |- Let(x, v1, e) --> v2
     where Env {x |--> v1, E} |- e --> v2.
-
-  
-  

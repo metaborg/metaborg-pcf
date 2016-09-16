@@ -4,6 +4,13 @@ imports
 
   signatures/-
 
+signature
+
+  constraint generator
+    BindPar [[ List(Bind) ^ (scope,scope) ]]
+    BindRec [[ List(Bind) ^ (scope) ]]
+    BindSeq [[ List(Bind) ^ (scope,scope) ]]
+
 rules
 
   [[ Let(x,e1,e2) ^ (s) : ty2 ]] :=

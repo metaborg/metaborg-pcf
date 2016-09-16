@@ -5,8 +5,8 @@ imports
   libstratego-lib
   libstratego-aterm
 
-  runtime/editor/outline-library
-  runtime/completion/-
+  libspoofax/editor/completion/-
+  libspoofax/editor/outline
 
   nabl2shared
   nabl2runtime

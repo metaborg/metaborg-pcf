@@ -10,6 +10,6 @@ imports
 
 rules
 
-  editor-analyze = analyze(desugar-all)
+  editor-analyze = nabl2-analyze(desugar-all)
 
-  debug-generate-constraint = debug
+  debug-generate-constraint = id

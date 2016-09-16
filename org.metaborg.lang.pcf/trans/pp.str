@@ -3,19 +3,19 @@ module pp
 imports
 
   libstratego-gpp
-  pp/-
+
+  completion/PCF-cp
+  pp/PCF-pp
 
 rules
 
   pp-PCF-string =
-    parenthesize-PCF
-    ; prettyprint-SDF-start-symbols
+      prettyprint-PCF-start-symbols
     ; !V([], <id>)
     ; box2text-string(|120)
 
   pp-partial-PCF-string =
-    parenthesize-PCF
-    ; prettyprint-example
+      prettyprint-PCF
     ; !V([], <id>)
     ; box2text-string(|120)
 

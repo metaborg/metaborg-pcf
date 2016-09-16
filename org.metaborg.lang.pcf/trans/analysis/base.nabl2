@@ -8,8 +8,8 @@ signature
 
   constraint generator
     // scope parameters and (optionally) type per syntactic sort
-    [[ Start ^ (s)     ]]
-    [[ Exp   ^ (s) : * ]]
+    [[ Start ^ (scope)     ]]
+    [[ Expr  ^ (scope) : * ]]
 
   name resolution
     // custom edge labels (extends default set of P, I)
@@ -32,7 +32,8 @@ signature
  
 rules
 
-  init ^ (s) : ty := new s.
+  init ^ (s) : ty :=
+    new s.
 
   [[ Start(e) ^ (s) : ty ]] :=
     [[ e ^ (s) : ty ]].
@@ -40,7 +41,6 @@ rules
 rules
 
   [[ Const(_) ^ (_) : TInt() ]] :=
-    true,
     true.
 
   [[ Ifz(c,t,f) ^ (s) : ty ]] :=
