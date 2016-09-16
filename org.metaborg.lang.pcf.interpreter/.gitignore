@@ -1,6 +1,7 @@
 /target/
 /.apt_generated/
 /src/main/java/**/generated/
+/src/main/java/**/natives/nabl2_*
 /src/main/resources/parsetable.tbl
 /src/main/resources/specification.aterm
 /.project
