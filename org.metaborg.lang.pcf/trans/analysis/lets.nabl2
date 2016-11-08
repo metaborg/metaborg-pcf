@@ -26,6 +26,7 @@ rules
   [[ LetPar(bs,e) ^ (s) : ty ]] :=
     s' -P-> s,
     BindPar [[ bs ^ (s,s') ]],
+    distinct D(s'),
     [[ e ^ (s') : ty ]],
     new s'.
 
@@ -42,6 +43,7 @@ rules
   [[ LetRec(bs,e) ^ (s) : ty ]] :=
     s' -P-> s,
     BindRec [[ bs ^ (s') ]],
+    distinct D(s'),
     [[ e ^ (s') : ty ]],
     new s'.
 

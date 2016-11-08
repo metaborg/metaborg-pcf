@@ -7,14 +7,18 @@ imports
 signature
 
   constraint generator
+
     // scope parameters and (optionally) type per syntactic sort
-    [[ Start ^ (scope)     ]]
-    [[ Expr  ^ (scope) : * ]]
+    [[ Start ^ (scope)        ]]
+    [[ Expr  ^ (scope) : type ]]
 
   name resolution
-    // custom edge labels (extends default set of P, I)
+
+    // edge label set
     labels
-    // partial order for the labels (extends default label order)
+      P I
+
+    // partial order for the labels
     // NB. for now implied pairs are not calculated,
     //     so make sure to be complete. E.g. in the case of
     //     X < Y, Y < Z you must add X < Z as well.
@@ -22,20 +26,21 @@ signature
       D < I,
       D < P,
       I < P
-    // specify well-formedness regex (overrides default well-formedness)
+
+    // specify well-formedness regex
     well-formedness
-      P*.I*
+      P* . I*
 
   types
-    TInt()
-    TFun(type,type)
- 
+    TInt()           
+    TFun(type, type)
+
 rules
 
-  init ^ (s) : ty :=
+  init ^ (s) :=
     new s.
 
-  [[ Start(e) ^ (s) : ty ]] :=
+  [[ Start(e) ^ (s) ]] :=
     [[ e ^ (s) : ty ]].
 
 rules

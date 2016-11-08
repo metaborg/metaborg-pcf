@@ -2,14 +2,19 @@ module analysis/main
 
 imports
   
+  nabl2/api
   nabl2shared
   nabl2runtime
 
   desugar
   analysis/-
+  signatures/-
+  pp/-
 
 rules
 
   editor-analyze = nabl2-analyze(desugar-all)
 
-  debug-generate-constraint = id
+  nabl2-debug-constraint-generation-hook = id
+
+  nabl2-debug-analysis-hook = id

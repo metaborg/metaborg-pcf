@@ -1,5 +1,9 @@
 module Identifiers
 
+context-free syntax
+
+  Id.Id = ID
+
 lexical syntax
 
   INT        = "-"? [0-9]+

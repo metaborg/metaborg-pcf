@@ -2,6 +2,7 @@ module pcf
 
 imports
 
+  nabl2/runtime/interpreter/scopegraph-api
   nabl2/runtime/interpreter/scopegraph-impl
 
   ds-signatures/PCF-sig
@@ -13,17 +14,17 @@ imports
 
 signature
 
-  sorts V constructors
-    NumV     : Int -> V
-    ClosureV : Env * String * Expr -> V
-    FixV     : String * V -> V
-
   sort aliases
-    Env = Map(String, V)
+    Env = Map(Id, Val)
+
+  sorts Val constructors
+    NumV     : Int -> Val
+    ClosureV : Env * Id * Expr -> Val
+    FixV     : Id * Val -> Val
 
   arrows
-    Start -init-> V
-    Expr --> V
+    Start -init-> Val
+    Expr --> Val
  
   native operators
     parseI    : String -> Int
@@ -33,14 +34,17 @@ signature
     divideI   : Int * Int -> Int
 
   variables
+    v : Val
+
+  components
     E : Env
-    v : V
 
 rules
 
-  s@Start(e) -init-> v
-    where NaBL2(s) -init-> _;
-          Env {} |- e --> v.
+  start@Start(e) -init-> v
+    where NaBL2(start) -init-> _;
+          start -paramsOf-> s;
+          E {} |- e --> v.
 
   Const(i) --> NumV(parseI(i)).
  
@@ -51,25 +55,43 @@ rules
   BinExpr(NumV(i1), Times(), NumV(i2)) --> NumV(multiplyI(i1, i2)).
   BinExpr(NumV(i1), DividedBy(), NumV(i2)) --> NumV(divideI(i1, i2)).
 
-  E |- Ref(x) --> E[x].
-  //where pathOf(Occurrence("NS",x,index)) => p,
-  //      deref(p,f) => v. // [E(P),N(I,_),D(_)]
+  E |- Ref(x) --> E[x]
+    where //x -mkOccurrence-> o;
+          Occurrence(DefaultNamespace(),x,nabl2_indexOf(x)) -pathOf-> p.
 
   Ifz(NumV(0), v, _) --> v.
   Ifz(NumV(i), _, v) --> v
     where i != 0.
 
-  E |- fun@Fun(x, e) --> ClosureV(E, x, e)
-    where fun -paramsOf-> s;
-          fun -typeOf-> ty.
+  E |- f@Fun(x, e) --> ClosureV(E, x, e)
+    where f -paramsOf-> s;
+          s -initFrame-> _;
+        //x -mkOccurrence-> o;
+          Occurrence(DefaultNamespace(),x,nabl2_indexOf(x)) -typeOf-> ty.
 
   App(ClosureV(E, x, e), v) --> v'
-    where Env {x |--> v, E} |- e --> v'.
+    where E {x |--> v, E} |- e --> v'.
 
   Fix(fun, e) --> FixV(fun, e).
 
   App(fix@FixV(fun, ClosureV(E, x, e)), v) --> v'
-  where Env {fun |--> fix, x |--> v, E} |- e --> v'.
+  where E {fun |--> fix, x |--> v, E} |- e --> v'.
  
   E |- Let(x, v1, e) --> v2
-    where Env {x |--> v1, E} |- e --> v2.
+    where E {x |--> v1, E} |- e --> v2.
+
+///////////////////////////////
+//
+// Dummy Stuff for Testing Only
+//
+////////////////////////////////
+
+signature
+  arrows
+    Scope -initFrame-> Scope
+
+rules
+
+  s:Scope -initFrame-> s
+    where s -declsOf-> ds;
+          s -linksOf-> ls.

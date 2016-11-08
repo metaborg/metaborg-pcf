@@ -6,6 +6,7 @@ imports
 
 rules
 
+
   [[ Fun(x,e) ^ (s) : TFun(ty1,ty2) ]] :=
     [[ e ^ (s') : ty2 ]],
     {x} : ty1,
