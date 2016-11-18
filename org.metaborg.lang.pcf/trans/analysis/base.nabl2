@@ -53,7 +53,19 @@ rules
     [[ t ^ (s) : ty ]],
     [[ f ^ (s) : ty ]].
 
-  [[ BinExpr(e1,_,e2) ^ (s) : TInt() ]] :=
+  [[ Add(e1,e2) ^ (s) : TInt() ]] :=
+    [[ e1 ^ (s) : TInt() ]],
+    [[ e2 ^ (s) : TInt() ]].
+
+  [[ Subtract(e1,e2) ^ (s) : TInt() ]] :=
+    [[ e1 ^ (s) : TInt() ]],
+    [[ e2 ^ (s) : TInt() ]].
+
+  [[ Multiply(e1,e2) ^ (s) : TInt() ]] :=
+    [[ e1 ^ (s) : TInt() ]],
+    [[ e2 ^ (s) : TInt() ]].
+
+  [[ Divide(e1,e2) ^ (s) : TInt() ]] :=
     [[ e1 ^ (s) : TInt() ]],
     [[ e2 ^ (s) : TInt() ]].
 

@@ -5,8 +5,10 @@ imports
   nabl2/runtime/interpreter/scopegraph-api
   nabl2/runtime/interpreter/scopegraph-impl
 
+  nabl2/runtime/interpreter/frame-api
+  nabl2/runtime/interpreter/frame-impl
+
   ds-signatures/PCF-sig
-  ds-signatures/Desugared-sig
 
   analysis/base
   analysis/functions
@@ -14,13 +16,11 @@ imports
 
 signature
 
-  sort aliases
-    Env = Map(Id, Val)
-
-  sorts Val constructors
+  constructors
     NumV     : Int -> Val
-    ClosureV : Env * Id * Expr -> Val
-    FixV     : Id * Val -> Val
+    ClosureV : Frame * Occurrence * Expr -> Val
+  //FixV     : Occurrence * Val -> Val
+    NullV    : Val
 
   arrows
     Start -init-> Val
@@ -36,62 +36,57 @@ signature
   variables
     v : Val
 
-  components
-    E : Env
-
 rules
 
   start@Start(e) -init-> v
-    where NaBL2(start) -init-> _;
-          start -paramsOf-> s;
-          E {} |- e --> v.
+    where initNaBL2(start) --> NaBL2;
+          NaBL2 |- start -paramsOf-> s;
+          NaBL2 |- initHeap(start) --> H1;
+          NaBL2 |- initDefault(s,{}) :: H1 --> F :: H2;
+          NaBL2, F |- e :: H2 --> v.
 
   Const(i) --> NumV(parseI(i)).
  
-  Subtract(NumV(i), NumV(j)) --> NumV(subtractI(i, j)).
+  Add(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
+  Subtract(NumV(i1), NumV(i2)) --> NumV(subtractI(i1, i2)).
+  Multiply(NumV(i1), NumV(i2)) --> NumV(multiplyI(i1, i2)).
+  Divide(NumV(i1),NumV(i2)) --> NumV(divideI(i1, i2)).
 
-  BinExpr(NumV(i1), Plus(), NumV(i2)) --> NumV(addI(i1, i2)).
-  BinExpr(NumV(i1), Minus(), NumV(i2)) --> NumV(subtractI(i1, i2)).
-  BinExpr(NumV(i1), Times(), NumV(i2)) --> NumV(multiplyI(i1, i2)).
-  BinExpr(NumV(i1), DividedBy(), NumV(i2)) --> NumV(divideI(i1, i2)).
-
-  E |- Ref(x) --> E[x]
-    where //x -mkOccurrence-> o;
-          Occurrence(DefaultNamespace(),x,nabl2_indexOf(x)) -pathOf-> p.
+  Ref(x) :: H --> v
+    where x -mkOccurrence-> o;
+          o -pathOf-> p;
+          H |- get(lookup(p)) --> v.
 
   Ifz(NumV(0), v, _) --> v.
   Ifz(NumV(i), _, v) --> v
     where i != 0.
 
-  E |- f@Fun(x, e) --> ClosureV(E, x, e)
-    where f -paramsOf-> s;
-          s -initFrame-> _;
-        //x -mkOccurrence-> o;
-          Occurrence(DefaultNamespace(),x,nabl2_indexOf(x)) -typeOf-> ty.
+  F |- Fun(x, e) --> ClosureV(F, o, e)
+    where x -mkOccurrence-> o.
 
-  App(ClosureV(E, x, e), v) --> v'
-    where E {x |--> v, E} |- e --> v'.
+  App(ClosureV(F, o, e), v) :: H --> v'
+    where e -paramsOf-> s;
+          H |- scopeOf(F) --> sf;
+          { P() |--> { sf |--> F } } => ls;
+          { o |--> v } => vs;
+          initFrame(s,ls,vs) --> F';
+          F' |- e --> v'.
 
-  Fix(fun, e) --> FixV(fun, e).
+  F |- Let(x, v, e) :: H --> v'
+    where e -paramsOf-> s;
+          x -mkOccurrence-> o;
+          H |- scopeOf(F) --> sf;
+          { P() |--> { sf |--> F } } => ls;
+          { o |--> v } => vs;
+          initFrame(s,ls,vs) --> F';
+          F' |- e --> v'.
 
-  App(fix@FixV(fun, ClosureV(E, x, e)), v) --> v'
-  where E {fun |--> fix, x |--> v, E} |- e --> v'.
+//Fix(x, e) --> FixV(o, e)
+//  where x -mkOccurrence-> o.
+
+//App(fe@FixV(of, ClosureV(F, s, ov, e)), v) --> v'
+//       E {fun |--> fix, x |--> v, E} |- e --> v'.
  
-  E |- Let(x, v1, e) --> v2
-    where E {x |--> v1, E} |- e --> v2.
-
-///////////////////////////////
-//
-// Dummy Stuff for Testing Only
-//
-////////////////////////////////
-
-signature
-  arrows
-    Scope -initFrame-> Scope
-
 rules
 
-  s:Scope -initFrame-> s
-    where s -declsOf-> ds;
-          s -linksOf-> ls.
+  default(_) --> NullV().

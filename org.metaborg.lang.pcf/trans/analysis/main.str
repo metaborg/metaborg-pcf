@@ -6,14 +6,13 @@ imports
   nabl2shared
   nabl2runtime
 
-  desugar
   analysis/-
   signatures/-
   pp/-
 
 rules
 
-  editor-analyze = nabl2-analyze(desugar-all)
+  editor-analyze = nabl2-analyze(id)
 
   nabl2-debug-constraint-generation-hook = id
 
