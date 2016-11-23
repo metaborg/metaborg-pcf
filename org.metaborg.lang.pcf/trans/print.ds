@@ -1,0 +1,17 @@
+module print
+
+signature
+
+  native operators
+    printTermI : AST -> AST
+    printStringI : String -> String
+  
+  arrows
+    printTerm(AST) --> AST
+    printString(String) --> String
+  
+rules
+
+  printTerm(x) --> printTermI(x).
+  
+  printString(x) --> printStringI(x).
