@@ -11,12 +11,12 @@ template options
 context-free syntax
 
   Expr.Const    = INT
-  Expr.Ref      = Id
+  Expr.Ref      = Name
   Expr.Ifz      = <ifz <Expr> then <Expr> else <Expr>>       {longest-match}
-  Expr.Fun      = [fun [Id] -> [Expr]]                       {longest-match}
-  Expr.Fix      = [fix [Id] -> [Expr]]                       {longest-match}
+  Expr.Fun      = [fun [Name] -> [Expr]]                       {longest-match}
+  Expr.Fix      = [fix [Name] -> [Expr]]                       {longest-match}
   Expr.App      = <<Expr> <Expr>>                            {left}
-  Expr.Let      = <let <Id> = <Expr> in <Expr>>              {longest-match}
+  Expr.Let      = <let <Name> = <Expr> in <Expr>>              {longest-match}
   Expr.Add      = <<Expr> + <Expr>>                          {left}
   Expr.Subtract = <<Expr> - <Expr>>                          {left}
   Expr.Multiply = <<Expr> * <Expr>>                          {left}
@@ -26,7 +26,7 @@ context-free syntax
   Expr.LetRec   = <letrec <{Bind ";"}+> in <Expr>>           {longest-match}
   Expr.LetSeq   = <letseq <{Bind ";"}+> in <Expr>>           {longest-match}
 
-  Bind.Bind     = <<Id> = <Expr>>
+  Bind.Bind     = <<Name> = <Expr>>
 
   Expr          = <(<Expr>)> {bracket}
   

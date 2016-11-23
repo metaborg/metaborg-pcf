@@ -2,7 +2,7 @@ module Identifiers
 
 context-free syntax
 
-  Id.Id = ID
+  Name.Id = ID
 
 lexical syntax
 
