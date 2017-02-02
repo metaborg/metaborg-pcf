@@ -16,6 +16,8 @@ imports
   analysis/functions
   analysis/lets
 
+  print
+
 signature
 
   constructors
@@ -27,14 +29,14 @@ signature
   arrows
     Start -init-> Val
     Expr --> Val
- 
+  
   native operators
     parseI    : String -> Int
     addI      : Int * Int -> Int
     subtractI : Int * Int -> Int
     multiplyI : Int * Int -> Int
     divideI   : Int * Int -> Int
-
+  
   variables
     v : Val
 
@@ -54,11 +56,11 @@ rules
   Multiply(NumV(i1), NumV(i2)) --> NumV(multiplyI(i1, i2)).
   Divide(NumV(i1),NumV(i2)) --> NumV(divideI(i1, i2)).
 
-  Ref(x) :: H --> v
-    where x -mkOccurrence-> o;
-          o -pathOf-> p;
-          H |- get(lookup(p)) --> v.
-
+  Ref(x) --> get(lookup(p))
+    where 
+      x -mkOccurrence-> o;
+      o -pathOf-> p.
+  
   Ifz(NumV(0), v, _) --> v.
   Ifz(NumV(i), _, v) --> v
     where i != 0.
@@ -71,7 +73,7 @@ rules
           H |- scopeOf(F) --> sf;
           { P() |--> { sf |--> F } } => ls;
           { o |--> v } => vs;
-          initFrame(s,ls,vs) --> F';
+          initFrame(s, ls, vs) --> F';
           F' |- e --> v'.
 
   F |- Let(x, v, e) :: H --> v'
@@ -80,7 +82,7 @@ rules
           H |- scopeOf(F) --> sf;
           { P() |--> { sf |--> F } } => ls;
           { o |--> v } => vs;
-          initFrame(s,ls,vs) --> F';
+          initFrame(s, ls, vs) --> F';
           F' |- e --> v'.
 
 //Fix(x, e) --> FixV(o, e)
@@ -92,3 +94,4 @@ rules
 rules
 
   default(_) --> NullV().
+  
