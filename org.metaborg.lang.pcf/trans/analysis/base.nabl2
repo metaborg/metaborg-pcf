@@ -8,9 +8,8 @@ signature
 
   constraint generator
 
-    // scope parameters and (optionally) type per syntactic sort
     [[ Start ^ (scope)        ]]
-    [[ Expr  ^ (scope) : type ]]
+    [[ Expr  ^ (scope) : Type ]]
 
   name resolution
 
@@ -31,9 +30,9 @@ signature
     well-formedness
       P* . I*
 
-  types
-    TInt()           
-    TFun(type, type)
+  constructors
+    TInt : Type
+    TFun : Type * Type -> Type
 
 rules
 

@@ -28,4 +28,5 @@ rules
   [[ Ref(x) ^ (s) : ty ]] :=
     {x} -> s,
     {x} |-> d,
-    d : ty.
+    d : qty,
+    ty instOf qty.

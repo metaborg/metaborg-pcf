@@ -1,10 +1,15 @@
+
 /target/
-/.apt_generated/
-/src/main/java/**/generated/
-/src/main/java/**/natives/nabl2_*
-/src/main/resources/parsetable.tbl
-/src/main/resources/specification.aterm
-/.project
-/.classpath
-/.settings
-/.factorypath
+src/main/resources/specification.aterm
+src/main/resources/parsetable.tbl
+src/main/java/org/metaborg/lang/pcf/interpreter/generated
+src/main/java/org/metaborg/lang/pcf/interpreter/generated/terms
+src/main/java/org/metaborg/lang/pcf/interpreter/generated/terms/build
+src/main/java/org/metaborg/lang/pcf/interpreter/generated/terms/match
+src/test/java/org/metaborg/lang/pcf/interpreter/generated/test
+/PCF.launch
+/TestPCF.launch
+/PCF (Daemon).launch
+/PCF-server
+/PCF-client
+/PCF

@@ -8,7 +8,7 @@ signature
 
   constraint generator
     BindPar [[ List(Bind) ^ (scope,scope) ]]
-    BindRec [[ List(Bind) ^ (scope) ]]
+    BindRec [[ List(Bind) ^ (scope)       ]]
     BindSeq [[ List(Bind) ^ (scope,scope) ]]
 
 rules
@@ -17,8 +17,9 @@ rules
     [[ e1 ^ (s) : ty1 ]],
     [[ e2 ^ (s') : ty2 ]],
     s' -P-> s,
-    {x} <- s,
-    {x} : ty1,
+    {x} <- s',
+    {x} : qty1,
+    qty1 genOf ty1,
     new s'.
 
 rules

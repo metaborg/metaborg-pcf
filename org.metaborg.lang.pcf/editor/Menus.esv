@@ -2,10 +2,6 @@ module Menus
 
 menus
 
-  menu: "Test"
-
-    action: "With Failure" = test-with-failure
-
   menu: "Syntax" (openeditor) (meta) (realtime)
 
     action: "Show abstract syntax"   = debug-show-aterm (source)

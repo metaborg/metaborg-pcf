@@ -8,6 +8,8 @@ imports
   nabl2/runtime/interpreter/frame-api
   nabl2/runtime/interpreter/frame-impl
 
+  nabl2/runtime/interpreter/util
+
   ds-signatures/PCF-sig
 
   analysis/base
