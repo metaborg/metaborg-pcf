@@ -5,7 +5,7 @@ imports
   Menus
   nabl2/Menus
   nabl2/References
-  editor/Colorer.generated
+  libspoofax/color/default
   completion/colorer/PCF-cc-esv
 
 language General properties
