@@ -14,6 +14,3 @@ rules
 
   editor-analyze = nabl2-analyze(id)
 
-  nabl2-debug-constraint-generation-hook = id
-
-  nabl2-debug-analysis-hook = id
