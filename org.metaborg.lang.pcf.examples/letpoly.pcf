@@ -1,0 +1,4 @@
+let id = fun x -> x
+in let x = id 6
+in let f = id (fun x -> x + 5)
+in id
