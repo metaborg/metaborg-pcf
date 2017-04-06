@@ -4,4 +4,4 @@ dependencies:
   - "org.metaborg:org.metaborg.lang.pcf:1.0.0-SNAPSHOT"
 runtime:
   nabl2:
-    debug: true
+    debug: analysis files
