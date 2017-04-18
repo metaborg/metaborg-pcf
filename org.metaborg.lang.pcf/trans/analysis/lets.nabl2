@@ -7,9 +7,9 @@ imports
 signature
 
   constraint generator
-    BindPar [[ List(Bind) ^ (scope,scope) ]]
-    BindRec [[ List(Bind) ^ (scope)       ]]
-    BindSeq [[ List(Bind) ^ (scope,scope) ]]
+    BindPar [[ list(Bind) ^ (scope,scope) ]]
+    BindRec [[ list(Bind) ^ (scope)       ]]
+    BindSeq [[ list(Bind) ^ (scope,scope) ]]
 
 rules
 
