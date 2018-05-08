@@ -6,33 +6,28 @@ imports
 
 signature
 
+  sorts
+    Type
+
+  constructors
+    TInt : Type
+    TFun : Type * Type -> Type
+
   constraint generator
 
     [[ Start ^ (scope)        ]]
     [[ Expr  ^ (scope) : Type ]]
 
   name resolution
-
-    // edge label set
     labels
-      P I
-
-    // partial order for the labels
-    // NB. for now implied pairs are not calculated,
-    //     so make sure to be complete. E.g. in the case of
-    //     X < Y, Y < Z you must add X < Z as well.
+      P
+      I
     order
       D < I,
       D < P,
       I < P
-
-    // specify well-formedness regex
     well-formedness
-      P* . I*
-
-  constructors
-    TInt : Type
-    TFun : Type * Type -> Type
+      P* I*
 
 rules
 
@@ -45,8 +40,8 @@ rules
 rules
 
   [[ Const(_) ^ (_) : TInt() ]] :=
-    true.
-
+      true.
+      
   [[ Ifz(c,t,f) ^ (s) : ty ]] :=
     [[ c ^ (s) : TInt() ]],
     [[ t ^ (s) : ty ]],

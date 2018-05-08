@@ -1,7 +1,14 @@
 
-/target/
+/bin
+/target
+/.project
+/.classpath
+/.settings
+/.factorypath
+src/main/resources/signatures-digest.cache
 src/main/resources/specification.aterm
 src/main/resources/parsetable.tbl
+src/main/resources/logback.xml
 src/main/java/org/metaborg/lang/pcf/interpreter/generated
 src/main/java/org/metaborg/lang/pcf/interpreter/generated/terms
 src/main/java/org/metaborg/lang/pcf/interpreter/generated/terms/build
@@ -9,7 +16,9 @@ src/main/java/org/metaborg/lang/pcf/interpreter/generated/terms/match
 src/test/java/org/metaborg/lang/pcf/interpreter/generated/test
 /PCF.launch
 /TestPCF.launch
+/PCF (Core).launch
 /PCF (Daemon).launch
+/PCF-core
 /PCF-server
 /PCF-client
 /PCF

@@ -12,6 +12,6 @@ signature
   
 rules
 
-  printTerm(x) --> printTermI(x).
+  printTerm(x) --> printTermI(x)
   
-  printString(x) --> printStringI(x).
+  printString(x) --> printStringI(x)

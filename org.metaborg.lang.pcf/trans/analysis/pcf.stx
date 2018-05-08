@@ -1,0 +1,95 @@
+module pcf
+
+signature
+  sorts ID  = string                        // $x$
+  sorts INT = string                        // $n$
+
+  sorts Start constructors
+    Start : Expr -> Start
+
+  sorts Name constructors
+    Id : ID -> Name
+
+  sorts Expr constructors                   // $e$ :=
+    Const    : INT -> Expr                  //      | $n$
+    Ref      : Name -> Expr                 //      | $x$
+    Ifz      : Expr * Expr * Expr -> Expr   //      | ifz $e$ then $e$ else $e$
+    Fun      : Name * Expr -> Expr          //      | fun ($x$ : $te$) { $e$ }
+    App      : Expr * Expr -> Expr          //      | $e$ $e$
+    Let      : Name * Expr * Expr -> Expr   //      | let $x$ = $e$ in $e$
+    Add      : Expr * Expr -> Expr          //      | $e$ + $e$
+    Subtract : Expr * Expr -> Expr          //      | $e$ - $e$
+    Multiply : Expr * Expr -> Expr          //      | $e$ * $e$
+    Divide   : Expr * Expr -> Expr          //      | $e$ / $e$
+
+  sorts TypeExp constructors                // $te$ :=
+    NumType : TypeExp                       //       | num
+    FunType : TypeExp * TypeExp -> TypeExp  //       | $te$ -> $te$
+
+  sorts Type constructors
+    NUM : Type
+    FUN : Type * Type -> Type
+
+  relations
+    typeOfDecl : occurrence -> Type
+
+  namespaces
+    Var  : string
+    Type : string
+
+  name-resolution
+    labels P R
+    resolve Var filter pathMatch[P*] min pathLt[$ < P]
+
+rules
+
+  programOk : Start
+  
+  programOk(Start(e)) :- {s} new s,
+    typeOfExpr(s, e) == _.
+
+rules
+
+  typeOfExpr : scope * Expr ->  Type
+
+  typeOfExpr(s, Const(_)) = NUM().
+
+  typeOfExpr(s, Ref(Id(x))) = T :-
+    typeOfDecl of Var{x@x} in s |-> [(_, (_, T))].
+
+  typeOfExpr(s, Ifz(e1, e2, e3)) = ty :-
+    typeOfExpr(s, e1) == NUM(),
+    typeOfExpr(s, e2) == ty,
+    typeOfExpr(s, e3) == ty.
+
+  typeOfExpr(s, Fun(Id(x), e)) = FUN(S, T) :- {s_fun}
+    new s_fun, s_fun -P-> s,
+    s_fun -> Var{x@x} with typeOfDecl S,
+    typeOfExpr(s_fun, e) == T.
+
+  typeOfExpr(s, App(e1, e2)) = T :- {S U}
+    typeOfExpr(s, e1) == FUN(S, T),
+    typeOfExpr(s, e2) == U,
+    U == S.
+
+  typeOfExpr(s, Let(Id(x), e1, e2)) = T :- {s_let U}
+    typeOfExpr(s, e1) == U,
+    new s_let, s_let -P-> s,
+    s_let -> Var{x@x} with typeOfDecl U,
+    typeOfExpr(s_let, e2) == T.
+
+  typeOfExpr(s, Add(e1, e2)) = NUM() :-
+    typeOfExpr(s, e1) == NUM(),
+    typeOfExpr(s, e2) == NUM().
+
+  typeOfExpr(s, Subtract(e1, e2)) = NUM() :-
+    typeOfExpr(s, e1) == NUM(),
+    typeOfExpr(s, e2) == NUM().
+
+  typeOfExpr(s, Multiply(e1, e2)) = NUM() :-
+    typeOfExpr(s, e1) == NUM(),
+    typeOfExpr(s, e2) == NUM().
+
+  typeOfExpr(s, Divide(e1, e2)) = NUM() :-
+    typeOfExpr(s, e1) == NUM(),
+    typeOfExpr(s, e2) == NUM().

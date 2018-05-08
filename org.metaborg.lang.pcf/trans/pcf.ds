@@ -47,26 +47,26 @@ rules
           NaBL2 |- start -paramsOf-> s;
           NaBL2 |- initHeap(start) --> H1;
           NaBL2 |- initDefault(s,{}) :: H1 --> F :: H2;
-          NaBL2, F |- e :: H2 --> v.
+          NaBL2, F |- e :: H2 --> v
 
-  Const(i) --> NumV(parseI(i)).
+  Const(i) --> NumV(parseI(i))
  
-  Add(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2)).
-  Subtract(NumV(i1), NumV(i2)) --> NumV(subtractI(i1, i2)).
-  Multiply(NumV(i1), NumV(i2)) --> NumV(multiplyI(i1, i2)).
-  Divide(NumV(i1),NumV(i2)) --> NumV(divideI(i1, i2)).
+  Add(NumV(i1), NumV(i2)) --> NumV(addI(i1, i2))
+  Subtract(NumV(i1), NumV(i2)) --> NumV(subtractI(i1, i2))
+  Multiply(NumV(i1), NumV(i2)) --> NumV(multiplyI(i1, i2))
+  Divide(NumV(i1),NumV(i2)) --> NumV(divideI(i1, i2))
 
   Ref(x) --> get(lookup(p))
     where 
-      x -mkOccurrence-> o;
-      o -pathOf-> p.
+      mkOccurrence(x) => o;
+      pathOf(o) => p
   
-  Ifz(NumV(0), v, _) --> v.
+  Ifz(NumV(0), v, _) --> v
   Ifz(NumV(i), _, v) --> v
-    where i != 0.
+    where i != 0
 
   F |- Fun(x, e) --> ClosureV(F, o, e)
-    where x -mkOccurrence-> o.
+    where mkOccurrence(x) => o
 
   App(ClosureV(F, o, e), v) :: H --> v'
     where e -paramsOf-> s;
@@ -74,16 +74,16 @@ rules
           { P() |--> { sf |--> F } } => ls;
           { o |--> v } => vs;
           initFrame(s, ls, vs) --> F';
-          F' |- e --> v'.
+          F' |- e --> v'
 
   F |- Let(x, v, e) :: H --> v'
     where e -paramsOf-> s;
-          x -mkOccurrence-> o;
+          mkOccurrence(x) => o;
           H |- scopeOf(F) --> sf;
           { P() |--> { sf |--> F } } => ls;
           { o |--> v } => vs;
           initFrame(s, ls, vs) --> F';
-          F' |- e --> v'.
+          F' |- e --> v'
 
 //Fix(x, e) --> FixV(o, e)
 //  where x -mkOccurrence-> o.
@@ -93,5 +93,4 @@ rules
  
 rules
 
-  default(_) --> NullV().
-  
+  default(_) --> NullV()

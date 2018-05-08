@@ -13,10 +13,10 @@ context-free syntax
   Expr.Const    = INT
   Expr.Ref      = Name
   Expr.Ifz      = <ifz <Expr> then <Expr> else <Expr>>       {longest-match}
-  Expr.Fun      = [fun [Name] -> [Expr]]                       {longest-match}
-  Expr.Fix      = [fix [Name] -> [Expr]]                       {longest-match}
+  Expr.Fun      = [fun [Name] -> [Expr]]                     {longest-match}
+  Expr.Fix      = [fix [Name] -> [Expr]]                     {longest-match}
   Expr.App      = <<Expr> <Expr>>                            {left}
-  Expr.Let      = <let <Name> = <Expr> in <Expr>>              {longest-match}
+  Expr.Let      = <let <Name> = <Expr> in <Expr>>            {longest-match}
   Expr.Add      = <<Expr> + <Expr>>                          {left}
   Expr.Subtract = <<Expr> - <Expr>>                          {left}
   Expr.Multiply = <<Expr> * <Expr>>                          {left}
