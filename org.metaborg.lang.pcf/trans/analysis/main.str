@@ -1,9 +1,13 @@
 module analysis/main
 
 imports
+
+  libspoofax/core/language
   
   nabl2/api
   nabl2runtime
+  
+  statixruntime
 
   analysis/-
   signatures/-
@@ -11,5 +15,7 @@ imports
 
 rules
 
-  editor-analyze = nabl2-analyze(id)
+//editor-analyze = nabl2-analyze(id)
 
+  editor-analyze: (ast, path, project-path) -> result
+    with result := <stx-analyze(|"pcf", "programOk")> ast

@@ -19,4 +19,4 @@ language General properties
 
   provider:          target/metaborg/stratego.ctree
 
-  observer:          editor-analyze (constraint)
+  observer:          editor-analyze // (constraint)
