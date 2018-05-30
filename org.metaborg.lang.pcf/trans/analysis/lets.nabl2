@@ -18,8 +18,7 @@ rules
     [[ e2 ^ (s') : ty2 ]],
     s' -P-> s,
     {x} <- s',
-    {x} : qty1,
-    qty1 genOf ty1,
+    {x} : ty1,
     new s'.
 
 rules
