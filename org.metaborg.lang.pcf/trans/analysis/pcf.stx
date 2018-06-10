@@ -15,12 +15,19 @@ signature
     Ref      : Name -> Expr                 //      | $x$
     Ifz      : Expr * Expr * Expr -> Expr   //      | ifz $e$ then $e$ else $e$
     Fun      : Name * Expr -> Expr          //      | fun ($x$ : $te$) { $e$ }
+    Fix      : Name * Expr -> Expr          //      | fix ($x$ : $te$) { $e$ }
     App      : Expr * Expr -> Expr          //      | $e$ $e$
     Let      : Name * Expr * Expr -> Expr   //      | let $x$ = $e$ in $e$
     Add      : Expr * Expr -> Expr          //      | $e$ + $e$
     Subtract : Expr * Expr -> Expr          //      | $e$ - $e$
     Multiply : Expr * Expr -> Expr          //      | $e$ * $e$
     Divide   : Expr * Expr -> Expr          //      | $e$ / $e$
+    LetPar   : list(Bind) * Expr  -> Expr   //      | letpar $b*$ in $e$
+    LetRec   : list(Bind) * Expr  -> Expr   //      | letrec $b*$ in $e$
+    LetSeq   : list(Bind) * Expr  -> Expr   //      | letseq $b*$ in $e$
+
+  sorts Bind constructors                   // $b$ :=
+    Bind : Name * Expr -> Bind              //      | $x$ = $e$
 
   sorts TypeExp constructors                // $te$ :=
     NumType : TypeExp                       //       | num
@@ -44,7 +51,7 @@ signature
 rules
 
   programOk : Start
-  
+
   programOk(Start(e)) :- {s} new s,
     typeOfExpr(s, e) == _.
 
@@ -55,6 +62,7 @@ rules
   typeOfExpr(s, Const(_)) = NUM().
 
   typeOfExpr(s, Ref(Id(x))) = T :-
+    Var{x@x} in s |-> [(_, _)],
     typeOfDecl of Var{x@x} in s |-> [(_, (_, T))].
 
   typeOfExpr(s, Ifz(e1, e2, e3)) = ty :-
@@ -66,6 +74,11 @@ rules
     new s_fun, s_fun -P-> s,
     s_fun -> Var{x@x} with typeOfDecl S,
     typeOfExpr(s_fun, e) == T.
+
+  typeOfExpr(s, Fix(Id(x), e)) = FUN(T, T) :- {s_fix}
+    new s_fix, s_fix -P-> s,
+    s_fix -> Var{x@x} with typeOfDecl FUN(T, T),
+    typeOfExpr(s_fix, e) == FUN(T, T).
 
   typeOfExpr(s, App(e1, e2)) = T :- {S U}
     typeOfExpr(s, e1) == FUN(S, T),
@@ -93,3 +106,54 @@ rules
   typeOfExpr(s, Divide(e1, e2)) = NUM() :-
     typeOfExpr(s, e1) == NUM(),
     typeOfExpr(s, e2) == NUM().
+
+rules
+
+  typeOfExpr(s, LetPar(binds, e)) = T :- {s_let}
+    new s_let, s_let -P-> s,
+    parBindsOK(s, s_let, binds),
+    T == typeOfExpr(s_let, e).
+
+  parBindsOK : scope * scope * list(Bind)
+
+  parBindsOK(s, s_let, []).
+
+  parBindsOK(s, s_let, [Bind(Id(x), e)|binds]) :- {T}
+    typeOfExpr(s, e, T),
+    s_let -> Var{x@x} with typeOfDecl T,
+    parBindsOK(s, s_let, binds).
+
+rules
+
+  typeOfExpr(s, LetRec(binds, e)) = T :- {s_let}
+    new s_let, s_let -P-> s,
+    recBindsOK(s_let, binds),
+    typeOfExpr(s_let, e) == T.
+
+  recBindsOK : scope * list(Bind)
+
+  recBindsOK(s, []).
+
+  recBindsOK(s, [Bind(Id(x), e)|binds]) :- {T}
+    typeOfExpr(s, e, T),
+    s -> Var{x@x} with typeOfDecl T,
+    recBindsOK(s, binds).
+
+rules
+
+  typeOfExpr(s, LetSeq(binds, e)) = T :- {s_let}
+    seqBindsOK(s, binds) == s_let,
+    typeOfExpr(s_let, e) == T.
+
+  seqBindsOK : scope * list(Bind) -> scope
+
+  // FIXME Patterns are not properly linearized, so the short version
+  //       does not work corectly
+//seqBindsOK(s, []) = s.
+  seqBindsOK(s, []) = s' :- s' == s.
+
+  seqBindsOK(s, [Bind(Id(x), e)|binds]) = s''  :- {s' T}
+    typeOfExpr(s, e) == T,
+    new s', s' -P-> s,
+    s' -> Var{x@x} with typeOfDecl T,
+    seqBindsOK(s', binds) == s''.
